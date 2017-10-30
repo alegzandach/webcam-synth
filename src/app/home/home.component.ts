@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 
 @Component({
     selector: 'home-app',
@@ -8,24 +8,48 @@ import { Component, ElementRef, ViewChild } from '@angular/core';
   export class HomeComponent {
 
     public name = 'viewer';
-    public state: number = 0;
+    public state: boolean = false;
     public imgWidth = 100;
 
-    @ViewChild('img') elRef: ElementRef;
+    @ViewChild('img') img: ElementRef;
 
     public onClick (event) {
-      if (this.state === 0){
+      this.img.nativeElement.addEventListener('scroll', () => console.log('ev1'));
+      this.img.nativeElement.onpointermove = this.pointerdown_handler;
+      this.img.nativeElement.setPointerCapture(1);
+      if (!this.state){
         this.imgWidth = 150;
-        console.log(this.elRef.nativeElement.setPointerCapture());
-        this.state = 1;
+        this.state = true;
       }
-      else if (this.state === 1){
+      else if (this.state){
         this.imgWidth = 100;
-        this.state = 0;
+        this.state = false;
       }
     };
 
-    public onMove (event) {
+    public startTouch (event) {
       console.log(event);
+    }
+
+    public wheel(ev){
+      ev.preventDefault();
+      console.log(ev);
+      if(ev.deltaY < 0){
+        this.imgWidth = this.imgWidth + ev.deltaY;
+      }else if(ev.deltaY > 0){
+        this.imgWidth = this.imgWidth + ev.deltaY;
+      }
+    }
+
+    public onMove (event) {
+      // event.preventDefault();
+      // console.log(event);
+    }
+
+    public pointerdown_handler(ev) {
+      console.log(ev);
+      //this.img.nativeElement.setPointerCapture();
+      //console.log("pointerDown", ev);
+      return false;
     }
   };
