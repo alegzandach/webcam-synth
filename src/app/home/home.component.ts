@@ -1,5 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { Observable } from 'rxjs/Rx'
+import { Observable } from 'rxjs'
 import { WebCamComponent } from 'ack-angular-webcam';
 declare var require: any;
 var Tone = require('tone/build/Tone');
