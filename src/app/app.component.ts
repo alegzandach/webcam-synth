@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+declare var require: any;
+window['Tone'] = require('tone/build/Tone');
 
 @Component({
   selector: 'app-root',

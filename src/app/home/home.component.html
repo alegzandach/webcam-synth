@@ -1,4 +1,7 @@
-<header>
-    {{ name }}
-</header>
-<img #img (wheel)="wheel($event)" (click)="onClick($event)" (mousemove)="onMove($event)" src="../../assets/SPED_17.jpeg" [style.width.%]="imgWidth">
+<ack-webcam
+  [(ref)]   = "webcam"
+  [options] = "options"
+  (success) = "onCamSuccess($event)"
+  (catch)   = "onCamError($event)"
+></ack-webcam>
+<!--<img #img (wheel)="wheel($event)" (click)="onClick($event)" (mousemove)="onMove($event)" src="../../assets/SPED_17.jpeg" [style.width.%]="imgWidth">-->
