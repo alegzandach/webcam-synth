@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Observable } from 'rxjs'
-import { WebCamComponent } from 'ack-angular-webcam';
+
 declare var require: any;
 var Tone = require('tone/build/Tone');
 
@@ -12,6 +12,9 @@ var Tone = require('tone/build/Tone');
 
   export class HomeComponent implements OnInit {
 
+    public showVid = false;
+    public video;
+    public cam
     public name = 'viewer';
     public state: boolean = false;
     public imgWidth = 100;
@@ -27,18 +30,26 @@ var Tone = require('tone/build/Tone');
 
     @ViewChild('img') img: ElementRef;
     @ViewChild('canvas') canvas: ElementRef;
+    @ViewChild('videoElement') videoElement: ElementRef;  
 
     public ngOnInit() {
-      const html = this.canvas;
+      this.video = this.videoElement.nativeElement;
+      var promise = navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
+        this.video.src = window.URL.createObjectURL(stream);
+        this.video.play();
+      }).catch(err => {
+        console.log(err);
+      });
+      const ctx = this.canvas.nativeElement.getContext('2d');
       const pix = this.pic;
-      this.pic.onload = () => {
+      /*this.pic.onload = () => {
         html.nativeElement.width = pix.naturalWidth;
         html.nativeElement.height = pix.naturalHeight;
         html.nativeElement.getContext('2d').drawImage(pix,0,0,pix.width,pix.height);
         var data = html.nativeElement.getContext('2d').getImageData(0,0,pix.width,pix.height).data;
         var colors = this.getColors(data);
         this.toneGen(colors, 3, 4);
-      };
+      };*/
       this.pic.src = "../../assets/galaxy.jpg";
       this.ratio = this.pic.width/this.pic.height;
       this.natX = this.pic.width;
@@ -65,6 +76,18 @@ var Tone = require('tone/build/Tone');
       }
       return array;
     };
+
+    public show = () => {
+      this.showVid = true;
+      this.video = this.videoElement.nativeElement;
+      var promise = navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
+        this.video.src = window.URL.createObjectURL(stream);
+        this.video.play();
+      }).catch(err => {
+        console.log(err);
+      });
+      const ctx = this.canvas.nativeElement.getContext('2d');
+    }
 
     public average = (array: Array<any>) => {
       let sumR = 0;
@@ -156,7 +179,4 @@ var Tone = require('tone/build/Tone');
       console.log(counter)
       return voices;
     }
-    onCamError(err){}
- 
-  onCamSuccess(){}
   };

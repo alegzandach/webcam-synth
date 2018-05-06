@@ -1,7 +1,4 @@
-<ack-webcam
-  [(ref)]   = "webcam"
-  [options] = "options"
-  (success) = "onCamSuccess($event)"
-  (catch)   = "onCamError($event)"
-></ack-webcam>
+<video #videoElement *ngIf="showVid"></video>
 <!--<img #img (wheel)="wheel($event)" (click)="onClick($event)" (mousemove)="onMove($event)" src="../../assets/SPED_17.jpeg" [style.width.%]="imgWidth">-->
+<canvas #canvas></canvas>
+<button (click)="show($event)">show</button>
