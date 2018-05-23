@@ -1,4 +1,3 @@
-<video #videoElement *ngIf="showVid"></video>
-<!--<img #img (wheel)="wheel($event)" (click)="onClick($event)" (mousemove)="onMove($event)" src="../../assets/SPED_17.jpeg" [style.width.%]="imgWidth">-->
-<canvas #canvas></canvas>
-<button (click)="show($event)">show</button>
+<video #video [hidden]="showVid" id="video"></video>
+<canvas #canvas id="canvas" width="640" height="480" style="transform: translate(50%, 0%)"></canvas>
+<button #button (click)="start()" style="transform: translate(0%, 100%)">{{this.btn}}</button>

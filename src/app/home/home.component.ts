@@ -12,8 +12,7 @@ var Tone = require('tone/build/Tone');
 
   export class HomeComponent implements OnInit {
 
-    public showVid = false;
-    public video;
+    public showVid = true;
     public cam
     public name = 'viewer';
     public state: boolean = false;
@@ -27,33 +26,70 @@ var Tone = require('tone/build/Tone');
     public originY = 0;
     public scale = 1;
     public data = 0;
+    public stopped = true;
+    public btn = "Start";
 
     @ViewChild('img') img: ElementRef;
     @ViewChild('canvas') canvas: ElementRef;
-    @ViewChild('videoElement') videoElement: ElementRef;  
+    @ViewChild('video') videoElement: ElementRef;  
 
     public ngOnInit() {
-      this.video = this.videoElement.nativeElement;
-      var promise = navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
-        this.video.src = window.URL.createObjectURL(stream);
-        this.video.play();
+      const ctx = this.canvas.nativeElement.getContext('2d');
+      const video = this.videoElement.nativeElement;
+      video.addEventListener('play', () => {
+        setInterval(() => {
+          if (video.paused || video.ended || this.stopped) {
+            return;
+          }
+          ctx.drawImage(video,0,0,640,480)
+          var data = ctx.getImageData(0,0,640,480).data;
+          var colors = this.getColors(data);
+          this.toneGen(colors, 3, 4);
+          }, 100);
+      }, false);
+      navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
+        video.srcObject = stream;
+        video.play();
       }).catch(err => {
         console.log(err);
       });
-      const ctx = this.canvas.nativeElement.getContext('2d');
-      const pix = this.pic;
-      /*this.pic.onload = () => {
+      
+      //var data = ctx.getImageData(0,0,video.width,video.height).data;
+      //var colors = this.getColors(data);
+      //this.toneGen(colors, 3, 4);
+      /*const pix = this.pic;
+      this.pic.onload = () => {
         html.nativeElement.width = pix.naturalWidth;
         html.nativeElement.height = pix.naturalHeight;
         html.nativeElement.getContext('2d').drawImage(pix,0,0,pix.width,pix.height);
         var data = html.nativeElement.getContext('2d').getImageData(0,0,pix.width,pix.height).data;
         var colors = this.getColors(data);
         this.toneGen(colors, 3, 4);
-      };*/
+      };
       this.pic.src = "../../assets/galaxy.jpg";
       this.ratio = this.pic.width/this.pic.height;
       this.natX = this.pic.width;
-      this.natY = this.pic.height;
+      this.natY = this.pic.height;*/
+    }
+
+    public draw = (video, ctx) => {
+      if (video.paused || video.ended) {
+        return;
+      }
+      ctx.drawImage(video,0,0,640,480)
+      var data = ctx.getImageData(0,0,640,480).data;
+      var colors = this.getColors(data);
+      this.toneGen(colors, 3, 4);
+      setTimeout(this.draw(video, ctx), 100)
+    }
+
+    public start = () => {
+      this.stopped = !this.stopped;
+      if(this.btn === "Start"){
+        this.btn = "Stop";
+      }else {
+        this.btn = "Start";
+      }
     }
 
     public getColors = (data) => {
@@ -77,17 +113,17 @@ var Tone = require('tone/build/Tone');
       return array;
     };
 
-    public show = () => {
+    /*public show = () => {
       this.showVid = true;
-      this.video = this.videoElement.nativeElement;
       var promise = navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
-        this.video.src = window.URL.createObjectURL(stream);
+        this.video.srcObject(stream);
         this.video.play();
       }).catch(err => {
         console.log(err);
       });
       const ctx = this.canvas.nativeElement.getContext('2d');
-    }
+      ctx.drawImage(this.video,0,0,300,150);
+    }*/
 
     public average = (array: Array<any>) => {
       let sumR = 0;
@@ -114,17 +150,24 @@ var Tone = require('tone/build/Tone');
       //synth.set("detune", -1200);
       var i = 0;
       voices.forEach(function(element){
-        synth.voices[i].envelope.attack = (element[0][0]/255)
+        //synth.voices[i].envelope.attack = (element[0][0]/255)
         //synth.voices[i].oscillator.type = (element[0][0]/255)
-        synth.voices[i].envelope.decay = (element[1][1]/255)
+        synth.voices[i].envelope.decay = .1
         //synth.voices[i].oscillator.type = (element[1][1]/255)
-        synth.voices[i].envelope.sustain = (element[2][2]/255)
+        synth.voices[i].envelope.sustain = .2
         //synth.voices[i].oscillator.type = (element[2][2]/255)
-        synth.voices[i].envelope.release = 500;
+        synth.voices[i].envelope.release = .1;
         i++;
       })
       //play a chord
-      synth.triggerAttackRelease([voices[0][0][0], voices[0][0][1], voices[0][0][2]], [voices[0][3][0]]);
+      //synth.dispose();
+      synth.triggerAttackRelease(voices[1][1][1], '8n');
+      synth.triggerAttackRelease(voices[1][2][2], '8n');
+      synth.triggerAttackRelease(voices[2][1][2], '8n');
+      synth.triggerAttackRelease(voices[2][2][1], '8n');
+      //synth.triggerAttackRelease([voices[1][2][1], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
+      //synth.triggerAttackRelease([voices[2][1][2], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
+      //synth.triggerAttackRelease([voices[2][2][2], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
     }
 
     public divyUp = (rgba: number[], voiceAmt: number, paramAmt: number, natX, natY): any => {
