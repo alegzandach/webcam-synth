@@ -54,9 +54,6 @@ var Tone = require('tone/build/Tone');
         console.log(err);
       });
       
-      //var data = ctx.getImageData(0,0,video.width,video.height).data;
-      //var colors = this.getColors(data);
-      //this.toneGen(colors, 3, 4);
       /*const pix = this.pic;
       this.pic.onload = () => {
         html.nativeElement.width = pix.naturalWidth;
@@ -72,7 +69,7 @@ var Tone = require('tone/build/Tone');
       this.natY = this.pic.height;*/
     }
 
-    public draw = (video, ctx) => {
+    /*public draw = (video, ctx) => {
       if (video.paused || video.ended) {
         return;
       }
@@ -81,7 +78,7 @@ var Tone = require('tone/build/Tone');
       var colors = this.getColors(data);
       this.toneGen(colors, 3, 4);
       setTimeout(this.draw(video, ctx), 100)
-    }
+    }*/
 
     public start = () => {
       this.stopped = !this.stopped;
@@ -146,28 +143,26 @@ var Tone = require('tone/build/Tone');
           voices[i][j] = this.average(sections[i][j])
         }
       }
-      var synth = new Tone.PolySynth(vs, Tone.Synth).toMaster();
+      var synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
       //synth.set("detune", -1200);
       var i = 0;
       voices.forEach(function(element){
-        //synth.voices[i].envelope.attack = (element[0][0]/255)
-        //synth.voices[i].oscillator.type = (element[0][0]/255)
-        synth.voices[i].envelope.decay = .1
+        synth.voices[i].envelope.attack = (element[1][2]+1)/255
+        //synth.voices[i].oscillator.type = (element[1][3]/255)
+        synth.voices[i].envelope.decay = (element[1][1]+1)/255;
         //synth.voices[i].oscillator.type = (element[1][1]/255)
-        synth.voices[i].envelope.sustain = .2
+        synth.voices[i].envelope.sustain = (element[2][1]+1)/255;
         //synth.voices[i].oscillator.type = (element[2][2]/255)
-        synth.voices[i].envelope.release = .1;
+        synth.voices[i].envelope.release = (element[3][1]+1)/255;
         i++;
       })
       //play a chord
-      //synth.dispose();
-      synth.triggerAttackRelease(voices[1][1][1], '8n');
-      synth.triggerAttackRelease(voices[1][2][2], '8n');
-      synth.triggerAttackRelease(voices[2][1][2], '8n');
-      synth.triggerAttackRelease(voices[2][2][1], '8n');
-      //synth.triggerAttackRelease([voices[1][2][1], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
-      //synth.triggerAttackRelease([voices[2][1][2], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
-      //synth.triggerAttackRelease([voices[2][2][2], voices[1][2][1], voices[2][1][2]], [voices[2][2][2]]);
+      //synth.triggerAttackRelease(voices[0][1][1], '8n');
+      synth.triggerAttackRelease([voices[1][0][1], voices[0][1][1], voices[2][0][2]], '8n');
+      console.log(voices[0][1]);
+      console.log(voices[1][2]);
+      console.log(voices[2][3]);
+      //synth.triggerAttackRelease([voices[0][1][1], voices[1][0][1], voices[1][2][1]], [voices[2][3][2]], '8n');
     }
 
     public divyUp = (rgba: number[], voiceAmt: number, paramAmt: number, natX, natY): any => {
