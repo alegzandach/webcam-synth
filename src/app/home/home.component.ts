@@ -36,12 +36,14 @@ var Tone = require('tone/build/Tone');
     public ngOnInit() {
       const ctx = this.canvas.nativeElement.getContext('2d');
       const video = this.videoElement.nativeElement;
+      this.natX = this.canvas.nativeElement.width;
+      this.natY = this.canvas.nativeElement.height;
       video.addEventListener('play', () => {
         setInterval(() => {
           if (video.paused || video.ended || this.stopped) {
             return;
           }
-          ctx.drawImage(video,0,0,640,480)
+          ctx.drawImage(video,0,0,640,480);
           var data = ctx.getImageData(0,0,640,480).data;
           var colors = this.getColors(data);
           this.toneGen(colors, 3, 4);
@@ -56,10 +58,10 @@ var Tone = require('tone/build/Tone');
       
       /*const pix = this.pic;
       this.pic.onload = () => {
-        html.nativeElement.width = pix.naturalWidth;
-        html.nativeElement.height = pix.naturalHeight;
-        html.nativeElement.getContext('2d').drawImage(pix,0,0,pix.width,pix.height);
-        var data = html.nativeElement.getContext('2d').getImageData(0,0,pix.width,pix.height).data;
+        this.canvas.nativeElement.width = pix.naturalWidth;
+        this.canvas.nativeElement.height = pix.naturalHeight;
+        this.canvas.nativeElement.getContext('2d').drawImage(pix,0,0,pix.width,pix.height);
+        var data = this.canvas.nativeElement.getContext('2d').getImageData(0,0,pix.width,pix.height).data;
         var colors = this.getColors(data);
         this.toneGen(colors, 3, 4);
       };
@@ -147,21 +149,28 @@ var Tone = require('tone/build/Tone');
       //synth.set("detune", -1200);
       var i = 0;
       voices.forEach(function(element){
-        synth.voices[i].envelope.attack = (element[1][2]+1)/255
-        //synth.voices[i].oscillator.type = (element[1][3]/255)
-        synth.voices[i].envelope.decay = (element[1][1]+1)/255;
-        //synth.voices[i].oscillator.type = (element[1][1]/255)
-        synth.voices[i].envelope.sustain = (element[2][1]+1)/255;
-        //synth.voices[i].oscillator.type = (element[2][2]/255)
-        synth.voices[i].envelope.release = (element[3][1]+1)/255;
+        /*synth.voices[i].oscillator.attack = .1
+        synth.voices[i].oscillator.attack = .1
+        synth.voices[i].oscillator.attack = .1
+        synth.voices[i].oscillator.attack = .1*/
+        synth.voices[i].envelope.attack = (element[1][1]+element[1][1]+element[1][2]+1)/765;
+        synth.voices[i].envelope.decay = (element[1][0]+element[1][1]+element[1][2]+1)/765;
+        synth.voices[i].envelope.sustain = (element[2][0]+element[2][1]+element[2][2]+1)/765;
+        synth.voices[i].envelope.release = (element[3][0]+element[3][1]+element[3][2]+1)/765;
         i++;
       })
       //play a chord
       //synth.triggerAttackRelease(voices[0][1][1], '8n');
-      synth.triggerAttackRelease([voices[1][0][1], voices[0][1][1], voices[2][0][2]], '8n');
-      console.log(voices[0][1]);
-      console.log(voices[1][2]);
-      console.log(voices[2][3]);
+      const n1 = voices[1][0][0]+voices[1][0][1]+voices[1][0][2];
+      const n2 = voices[1][1][0]+voices[1][1][1]+voices[1][1][2];
+      const n3 = voices[1][2][0]+voices[1][2][1]+voices[1][2][2];
+      const n4 = voices[1][3][0]+voices[1][3][1]+voices[1][3][2];
+      synth.triggerAttackRelease([n1,n2,n3,n4], '8n');
+      //synth.triggerAttackRelease([150,200,250], '8n')
+      console.log(n1 + " 1");
+      console.log(n2 + " 2");
+      console.log(n3 + " 3");
+      console.log(n4 + " 4");
       //synth.triggerAttackRelease([voices[0][1][1], voices[1][0][1], voices[1][2][1]], [voices[2][3][2]], '8n');
     }
 
@@ -214,7 +223,8 @@ var Tone = require('tone/build/Tone');
           }
         }
       })
-      console.log(counter)
-      return voices;
+      const sections = voices;
+      voices = [];
+      return sections;
     }
   };
