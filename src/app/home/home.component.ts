@@ -1,5 +1,7 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Observable } from 'rxjs'
+import * as SuperGif from 'jsgif'
+
 
 declare var require: any;
 var Tone = require('tone/build/Tone');
@@ -28,21 +30,16 @@ var Tone = require('tone/build/Tone');
     public data = 0;
     public stopped = true;
     public btn = "Start";
+    public rub;
 
     @ViewChild('img') img: ElementRef;
-    @ViewChild('canvas') canvas: ElementRef;
-    @ViewChild('video') videoElement: ElementRef;  
+    @ViewChild('gifCanvas') ctx: ElementRef;
 
     public ngOnInit() {
-      const ctx = this.canvas.nativeElement.getContext('2d');
-      const video = this.videoElement.nativeElement;
-      this.natX = this.canvas.nativeElement.width;
-      this.natY = this.canvas.nativeElement.height;
-      video.addEventListener('play', () => {
-        setInterval(() => {
-          if (video.paused || video.ended || this.stopped) {
-            return;
-          }
+      //this.img.nativeElement.src = "../../assets/trippyblack.gif";
+      this. rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, show_progress_bar: false});
+      this.rub.load();
+    /*ctx =
           ctx.drawImage(video,0,0,640,480);
           var data = ctx.getImageData(0,0,640,480).data;
           var colors = this.getColors(data);
@@ -65,30 +62,24 @@ var Tone = require('tone/build/Tone');
         var colors = this.getColors(data);
         this.toneGen(colors, 3, 4);
       };
-      this.pic.src = "../../assets/galaxy.jpg";
+      this.pic.src = "../../assets/colors.gif";
       this.ratio = this.pic.width/this.pic.height;
       this.natX = this.pic.width;
       this.natY = this.pic.height;*/
     }
 
-    /*public draw = (video, ctx) => {
-      if (video.paused || video.ended) {
-        return;
-      }
-      ctx.drawImage(video,0,0,640,480)
-      var data = ctx.getImageData(0,0,640,480).data;
-      var colors = this.getColors(data);
-      this.toneGen(colors, 3, 4);
-      setTimeout(this.draw(video, ctx), 100)
-    }*/
-
-    public start = () => {
+    /*public start = () => {
       this.stopped = !this.stopped;
       if(this.btn === "Start"){
         this.btn = "Stop";
       }else {
         this.btn = "Start";
       }
+    }*/
+
+    public onChange = (data) => {
+      var colors = this.getColors(data.data);
+      this.toneGen(colors, 3, 4);
     }
 
     public getColors = (data) => {
@@ -138,7 +129,7 @@ var Tone = require('tone/build/Tone');
     }
 
     public toneGen = (rgba, vs, ps) => {
-      const sections = this.divyUp(rgba, vs, ps, this.natX, this.natY);
+      const sections = this.divyUp(rgba, vs, ps, 360, 240);
       const voices = this.create2DArray([vs,ps]);
       for(let i=0;i<vs;i++){
         for(let j=0;j<ps;j++){
@@ -165,18 +156,18 @@ var Tone = require('tone/build/Tone');
       const n2 = voices[1][1][0]+voices[1][1][1]+voices[1][1][2];
       const n3 = voices[1][2][0]+voices[1][2][1]+voices[1][2][2];
       const n4 = voices[1][3][0]+voices[1][3][1]+voices[1][3][2];
-      synth.triggerAttackRelease([n1,n2,n3,n4], '8n');
+      synth.triggerAttackRelease([n1/2,n2/2,n3/2,n4/2], '8n');
       //synth.triggerAttackRelease([150,200,250], '8n')
-      console.log(n1 + " 1");
-      console.log(n2 + " 2");
-      console.log(n3 + " 3");
-      console.log(n4 + " 4");
+      // console.log(n1 + " 1");
+      // console.log(n2 + " 2");
+      // console.log(n3 + " 3");
+      // console.log(n4 + " 4");
       //synth.triggerAttackRelease([voices[0][1][1], voices[1][0][1], voices[1][2][1]], [voices[2][3][2]], '8n');
     }
 
     public divyUp = (rgba: number[], voiceAmt: number, paramAmt: number, natX, natY): any => {
-      const paramRange = Math.floor(this.natX/paramAmt); // -1 for array index purposes
-      const voiceRange = Math.floor(this.natY/voiceAmt);
+      const paramRange = Math.floor(natX/paramAmt); // -1 for array index purposes
+      const voiceRange = Math.floor(natY/voiceAmt);
       let voices = this.create2DArray([voiceAmt, paramAmt]);
       let paramCounter = 0;
       let voiceCounter = 0;
