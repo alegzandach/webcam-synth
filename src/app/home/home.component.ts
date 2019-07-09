@@ -1,7 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Observable } from 'rxjs'
-import * as SuperGif from 'jsgif'
-
+import * as SuperGif from '../utility/libgif.js'
 
 declare var require: any;
 var Tone = require('tone/build/Tone');
@@ -15,7 +14,7 @@ var Tone = require('tone/build/Tone');
   export class HomeComponent implements OnInit {
 
     public showVid = true;
-    public cam
+    public cam;
     public name = 'viewer';
     public state: boolean = false;
     public imgWidth = 100;
@@ -40,7 +39,7 @@ var Tone = require('tone/build/Tone');
       //this.img.nativeElement.src = "../../assets/trippyblack.gif";
       this.synth = new Tone.PolySynth().toMaster();
       //this.synth.set("detune", -1200);
-      this. rub = new SuperGif({c_w: window.outerWidth, c_h: window.outerHeight, vp_w: window.outerWidth, vp_h: window.outerHeight, gif: this.img.nativeElement, on_change: this.onChange, show_progress_bar: false});
+      this.rub = new SuperGif({c_w: window.outerWidth, c_h: window.outerHeight, vp_w: window.outerWidth, vp_h: window.outerHeight, gif: this.img.nativeElement, on_change: this.onChange, show_progress_bar: false});
       this.rub.load();
     /*ctx =
           ctx.drawImage(video,0,0,640,480);
