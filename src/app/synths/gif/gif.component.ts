@@ -32,8 +32,8 @@ var Tone = require('tone/build/Tone');
     public btn = "Start";
     public rub;
 
-    @ViewChild('img') img: ElementRef;
-    @ViewChild('gifCanvas') ctx: ElementRef;
+    @ViewChild('img', { static: true }) img: ElementRef;
+    @ViewChild('gifCanvas', { static: false }) ctx: ElementRef;
 
     public ngOnInit() {
       this. rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, show_progress_bar: false});

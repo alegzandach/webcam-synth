@@ -29,9 +29,9 @@ var Tone = require('tone/build/Tone');
     public stopped = true;
     public btn = "Start";
 
-    @ViewChild('img') img: ElementRef;
-    @ViewChild('canvas') canvas: ElementRef;
-    @ViewChild('video') videoElement: ElementRef;  
+    @ViewChild('img', { static: false }) img: ElementRef;
+    @ViewChild('canvas', { static: true }) canvas: ElementRef;
+    @ViewChild('video', { static: true }) videoElement: ElementRef;  
 
     public ngOnInit() {
       const ctx = this.canvas.nativeElement.getContext('2d');
