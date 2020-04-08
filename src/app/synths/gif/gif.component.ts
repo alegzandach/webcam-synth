@@ -1,6 +1,6 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { Observable } from 'rxjs'
-import * as SuperGif from 'jsgif'
+import * as SuperGif from '../../utility/libgif.js'
 
 
 declare var require: any;
@@ -12,7 +12,7 @@ var Tone = require('tone/build/Tone');
     styleUrls: ['../../app.component.css']
   })
 
-  export class GifComponent implements OnInit {
+  export class GifComponent implements AfterViewInit {
 
     public showVid = true;
     public cam
@@ -35,7 +35,7 @@ var Tone = require('tone/build/Tone');
     @ViewChild('img') img: ElementRef;
     @ViewChild('gifCanvas') ctx: ElementRef;
 
-    public ngOnInit() {
+    public ngAfterViewInit() {
       this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, show_progress_bar: false});
       this.rub.load();
     }

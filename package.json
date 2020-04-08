@@ -21,11 +21,12 @@
     "@angular/platform-browser-dynamic": "^9.1.0",
     "@angular/router": "^9.1.0",
     "core-js": "^2.4.1",
-    "rxjs": "^6.5.5",
-    "tslib": "^1.10.0",
-    "zone.js": "~0.10.2",
     "gif-canvas": "^1.0.0",
-    "rxjs-compat": "^6.0.0-rc.0"
+    "jsgif": "^1.0.2",
+    "rxjs": "^6.5.5",
+    "rxjs-compat": "^6.0.0-rc.0",
+    "tslib": "^1.10.0",
+    "zone.js": "~0.10.2"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~0.901.0",
