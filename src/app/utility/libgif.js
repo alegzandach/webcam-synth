@@ -1031,9 +1031,10 @@
 
             div.className = 'jsgif';
             div.id = "canvasContainer"
-            div.style = "text-align: center;"
+            div.style = "text-align: center; flex-grow: 1"
             toolbar.className = 'jsgif_toolbar';
             canvas.id = 'jsgif_canvas'
+            canvas.style = ''
             div.appendChild(canvas);
 
             // div.appendChild(toolbar);
