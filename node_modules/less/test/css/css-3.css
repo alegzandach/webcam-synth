@@ -18,21 +18,21 @@ p:not([class*="lead"]) {
   color: black;
 }
 input[type="text"].class#id[attr=32]:not(1) {
-  color: white;
+  color: inherit;
 }
 div#id.class[a=1][b=2].class:not(1) {
-  color: white;
+  color: inherit;
 }
 ul.comma > li:not(:only-child)::after {
-  color: white;
+  color: inherit;
 }
 ol.comma > li:nth-last-child(2)::after {
-  color: white;
+  color: inherit;
 }
 li:nth-child(4n+1),
 li:nth-child(-5n),
 li:nth-child(-n+2) {
-  color: white;
+  color: inherit;
 }
 a[href^="http://"] {
   color: black;
@@ -72,14 +72,6 @@ p::before {
   100% {
     font-size: 12px;
   }
-}
-.units {
-  font: 1.2rem/2rem;
-  font: 8vw/9vw;
-  font: 10vh/12vh;
-  font: 12vm/15vm;
-  font: 12vmin/15vmin;
-  font: 1.2ch/1.5ch;
 }
 @supports ( box-shadow: 2px 2px 2px black ) or
           ( -moz-box-shadow: 2px 2px 2px black ) {

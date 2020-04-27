@@ -1,6 +1,5 @@
 @charset "UTF-8";
 /** comment at the top**/
-@import url(http://fonts.googleapis.com/css?family=Open+Sans);
 @import url(/absolute/something.css) screen and (color) and (max-width: 600px);
 @import url("//ha.com/file.css") (min-width: 100px);
 #import-test {
@@ -21,7 +20,7 @@
   height: 10px;
   color: red;
 }
-.test-f {
+.test-rule-f {
   height: 10px;
 }
 .deep-import-url {

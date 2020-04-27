@@ -1,9 +1,13 @@
-var Node = require("./node");
+import Node from './node';
 
-var UnicodeDescriptor = function (value) {
-    this.value = value;
-};
-UnicodeDescriptor.prototype = new Node();
-UnicodeDescriptor.prototype.type = "UnicodeDescriptor";
+class UnicodeDescriptor extends Node {
+    constructor(value) {
+        super();
 
-module.exports = UnicodeDescriptor;
+        this.value = value;
+    }
+}
+
+UnicodeDescriptor.prototype.type = 'UnicodeDescriptor';
+
+export default UnicodeDescriptor;

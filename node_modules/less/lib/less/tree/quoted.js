@@ -1,55 +1,70 @@
-var Node = require("./node"),
-    JsEvalNode = require("./js-eval-node"),
-    Variable = require("./variable");
+import Node from './node';
+import Variable from './variable';
+import Property from './property';
 
-var Quoted = function (str, content, escaped, index, currentFileInfo) {
-    this.escaped = (escaped == null) ? true : escaped;
-    this.value = content || '';
-    this.quote = str.charAt(0);
-    this.index = index;
-    this.currentFileInfo = currentFileInfo;
-};
-Quoted.prototype = new JsEvalNode();
-Quoted.prototype.type = "Quoted";
-Quoted.prototype.genCSS = function (context, output) {
-    if (!this.escaped) {
-        output.add(this.quote, this.currentFileInfo, this.index);
+
+class Quoted extends Node {
+    constructor(str, content, escaped, index, currentFileInfo) {
+        super();
+
+        this.escaped = (escaped == null) ? true : escaped;
+        this.value = content || '';
+        this.quote = str.charAt(0);
+        this._index = index;
+        this._fileInfo = currentFileInfo;
+        this.variableRegex = /@\{([\w-]+)\}/g;
+        this.propRegex = /\$\{([\w-]+)\}/g;
+        this.allowRoot = escaped;
     }
-    output.add(this.value);
-    if (!this.escaped) {
-        output.add(this.quote);
+
+    genCSS(context, output) {
+        if (!this.escaped) {
+            output.add(this.quote, this.fileInfo(), this.getIndex());
+        }
+        output.add(this.value);
+        if (!this.escaped) {
+            output.add(this.quote);
+        }
     }
-};
-Quoted.prototype.containsVariables = function() {
-    return this.value.match(/(`([^`]+)`)|@\{([\w-]+)\}/);
-};
-Quoted.prototype.eval = function (context) {
-    var that = this, value = this.value;
-    var javascriptReplacement = function (_, exp) {
-        return String(that.evaluateJavaScript(exp, context));
-    };
-    var interpolationReplacement = function (_, name) {
-        var v = new Variable('@' + name, that.index, that.currentFileInfo).eval(context, true);
-        return (v instanceof Quoted) ? v.value : v.toCSS();
-    };
-    function iterativeReplace(value, regexp, replacementFnc) {
-        var evaluatedValue = value;
-        do {
-            value = evaluatedValue;
-            evaluatedValue = value.replace(regexp, replacementFnc);
-        } while (value !== evaluatedValue);
-        return evaluatedValue;
+
+    containsVariables() {
+        return this.value.match(this.variableRegex);
     }
-    value = iterativeReplace(value, /`([^`]+)`/g, javascriptReplacement);
-    value = iterativeReplace(value, /@\{([\w-]+)\}/g, interpolationReplacement);
-    return new Quoted(this.quote + value + this.quote, value, this.escaped, this.index, this.currentFileInfo);
-};
-Quoted.prototype.compare = function (other) {
-    // when comparing quoted strings allow the quote to differ
-    if (other.type === "Quoted" && !this.escaped && !other.escaped) {
-        return Node.numericCompare(this.value, other.value);
-    } else {
-        return other.toCSS && this.toCSS() === other.toCSS() ? 0 : undefined;
+
+    eval(context) {
+        const that = this;
+        let value = this.value;
+        const variableReplacement = (_, name) => {
+            const v = new Variable(`@${name}`, that.getIndex(), that.fileInfo()).eval(context, true);
+            return (v instanceof Quoted) ? v.value : v.toCSS();
+        };
+        const propertyReplacement = (_, name) => {
+            const v = new Property(`$${name}`, that.getIndex(), that.fileInfo()).eval(context, true);
+            return (v instanceof Quoted) ? v.value : v.toCSS();
+        };
+        function iterativeReplace(value, regexp, replacementFnc) {
+            let evaluatedValue = value;
+            do {
+                value = evaluatedValue.toString();
+                evaluatedValue = value.replace(regexp, replacementFnc);
+            } while (value !== evaluatedValue);
+            return evaluatedValue;
+        }
+        value = iterativeReplace(value, this.variableRegex, variableReplacement);
+        value = iterativeReplace(value, this.propRegex, propertyReplacement);
+
+        return new Quoted(this.quote + value + this.quote, value, this.escaped, this.getIndex(), this.fileInfo());
     }
-};
-module.exports = Quoted;
+
+    compare(other) {
+        // when comparing quoted strings allow the quote to differ
+        if (other.type === 'Quoted' && !this.escaped && !other.escaped) {
+            return Node.numericCompare(this.value, other.value);
+        } else {
+            return other.toCSS && this.toCSS() === other.toCSS() ? 0 : undefined;
+        }
+    }
+}
+
+Quoted.prototype.type = 'Quoted';
+export default Quoted;

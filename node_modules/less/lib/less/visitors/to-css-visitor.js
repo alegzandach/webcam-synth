@@ -1,54 +1,45 @@
-var tree = require("../tree"),
-    Visitor = require("./visitor");
+import tree from '../tree';
+import Visitor from './visitor';
 
-var CSSVisitorUtils = function(context) {
-    this._visitor = new Visitor(this);
-    this._context = context;
-};
+class CSSVisitorUtils {
+    constructor(context) {
+        this._visitor = new Visitor(this);
+        this._context = context;
+    }
 
-CSSVisitorUtils.prototype = {
-    containsSilentNonBlockedChild: function(bodyRules) {
-        var rule;
-        if (bodyRules == null) {
+    containsSilentNonBlockedChild(bodyRules) {
+        let rule;
+        if (!bodyRules) {
             return false;
         }
-        for (var r = 0; r < bodyRules.length; r++) {
+        for (let r = 0; r < bodyRules.length; r++) {
             rule = bodyRules[r];
             if (rule.isSilent && rule.isSilent(this._context) && !rule.blocksVisibility()) {
-                //the directive contains something that was referenced (likely by extend)
-                //therefore it needs to be shown in output too
+                // the atrule contains something that was referenced (likely by extend)
+                // therefore it needs to be shown in output too
                 return true;
             }
         }
         return false;
-    },
+    }
 
-    keepOnlyVisibleChilds: function(owner) {
-        if (owner == null || owner.rules == null) {
-            return ;
+    keepOnlyVisibleChilds(owner) {
+        if (owner && owner.rules) {
+            owner.rules = owner.rules.filter(thing => thing.isVisible());
         }
+    }
 
-        owner.rules = owner.rules.filter(function(thing) {
-                return thing.isVisible();
-            }
-        );
-    },
+    isEmpty(owner) {
+        return (owner && owner.rules) 
+            ? (owner.rules.length === 0) : true;
+    }
 
-    isEmpty: function(owner) {
-        if (owner == null || owner.rules == null) {
-            return true;
-        }
-        return owner.rules.length === 0;
-    },
+    hasVisibleSelector(rulesetNode) {
+        return (rulesetNode && rulesetNode.paths)
+            ? (rulesetNode.paths.length > 0) : false;
+    }
 
-    hasVisibleSelector: function(rulesetNode) {
-        if (rulesetNode == null || rulesetNode.paths == null) {
-            return false;
-        }
-        return rulesetNode.paths.length > 0;
-    },
-
-    resolveVisibility: function (node, originalRules) {
+    resolveVisibility(node, originalRules) {
         if (!node.blocksVisibility()) {
             if (this.isEmpty(node) && !this.containsSilentNonBlockedChild(originalRules)) {
                 return ;
@@ -57,7 +48,7 @@ CSSVisitorUtils.prototype = {
             return node;
         }
 
-        var compiledRulesBody = node.rules[0];
+        const compiledRulesBody = node.rules[0];
         this.keepOnlyVisibleChilds(compiledRulesBody);
 
         if (this.isEmpty(compiledRulesBody)) {
@@ -68,9 +59,9 @@ CSSVisitorUtils.prototype = {
         node.removeVisibilityBlock();
 
         return node;
-    },
+    }
 
-    isVisibleRuleset: function(rulesetNode) {
+    isVisibleRuleset(rulesetNode) {
         if (rulesetNode.firstRoot) {
             return true;
         }
@@ -85,10 +76,9 @@ CSSVisitorUtils.prototype = {
 
         return true;
     }
+}
 
-};
-
-var ToCSSVisitor = function(context) {
+const ToCSSVisitor = function(context) {
     this._visitor = new Visitor(this);
     this._context = context;
     this.utils = new CSSVisitorUtils(context);
@@ -100,11 +90,11 @@ ToCSSVisitor.prototype = {
         return this._visitor.visit(root);
     },
 
-    visitRule: function (ruleNode, visitArgs) {
-        if (ruleNode.blocksVisibility() || ruleNode.variable) {
+    visitDeclaration: function (declNode, visitArgs) {
+        if (declNode.blocksVisibility() || declNode.variable) {
             return;
         }
-        return ruleNode;
+        return declNode;
     },
 
     visitMixinDefinition: function (mixinNode, visitArgs) {
@@ -124,7 +114,7 @@ ToCSSVisitor.prototype = {
     },
 
     visitMedia: function(mediaNode, visitArgs) {
-        var originalRules = mediaNode.rules[0].rules;
+        const originalRules = mediaNode.rules[0].rules;
         mediaNode.accept(this._visitor);
         visitArgs.visitDeeper = false;
 
@@ -138,56 +128,63 @@ ToCSSVisitor.prototype = {
         return importNode;
     },
 
-    visitDirective: function(directiveNode, visitArgs) {
-        if (directiveNode.rules && directiveNode.rules.length) {
-            return this.visitDirectiveWithBody(directiveNode, visitArgs);
+    visitAtRule: function(atRuleNode, visitArgs) {
+        if (atRuleNode.rules && atRuleNode.rules.length) {
+            return this.visitAtRuleWithBody(atRuleNode, visitArgs);
         } else {
-            return this.visitDirectiveWithoutBody(directiveNode, visitArgs);
+            return this.visitAtRuleWithoutBody(atRuleNode, visitArgs);
         }
     },
 
-    visitDirectiveWithBody: function(directiveNode, visitArgs) {
-        //if there is only one nested ruleset and that one has no path, then it is
-        //just fake ruleset
-        function hasFakeRuleset(directiveNode) {
-            var bodyRules = directiveNode.rules;
+    visitAnonymous: function(anonymousNode, visitArgs) {
+        if (!anonymousNode.blocksVisibility()) {
+            anonymousNode.accept(this._visitor);
+            return anonymousNode;
+        }
+    },
+
+    visitAtRuleWithBody: function(atRuleNode, visitArgs) {
+        // if there is only one nested ruleset and that one has no path, then it is
+        // just fake ruleset
+        function hasFakeRuleset(atRuleNode) {
+            const bodyRules = atRuleNode.rules;
             return bodyRules.length === 1 && (!bodyRules[0].paths || bodyRules[0].paths.length === 0);
         }
-        function getBodyRules(directiveNode) {
-            var nodeRules = directiveNode.rules;
-            if (hasFakeRuleset(directiveNode)) {
+        function getBodyRules(atRuleNode) {
+            const nodeRules = atRuleNode.rules;
+            if (hasFakeRuleset(atRuleNode)) {
                 return nodeRules[0].rules;
             }
 
             return nodeRules;
         }
-        //it is still true that it is only one ruleset in array
-        //this is last such moment
-        //process childs
-        var originalRules = getBodyRules(directiveNode);
-        directiveNode.accept(this._visitor);
+        // it is still true that it is only one ruleset in array
+        // this is last such moment
+        // process childs
+        const originalRules = getBodyRules(atRuleNode);
+        atRuleNode.accept(this._visitor);
         visitArgs.visitDeeper = false;
 
-        if (!this.utils.isEmpty(directiveNode)) {
-            this._mergeRules(directiveNode.rules[0].rules);
+        if (!this.utils.isEmpty(atRuleNode)) {
+            this._mergeRules(atRuleNode.rules[0].rules);
         }
 
-        return this.utils.resolveVisibility(directiveNode, originalRules);
+        return this.utils.resolveVisibility(atRuleNode, originalRules);
     },
 
-    visitDirectiveWithoutBody: function(directiveNode, visitArgs) {
-        if (directiveNode.blocksVisibility()) {
+    visitAtRuleWithoutBody: function(atRuleNode, visitArgs) {
+        if (atRuleNode.blocksVisibility()) {
             return;
         }
 
-        if (directiveNode.name === "@charset") {
+        if (atRuleNode.name === '@charset') {
             // Only output the debug info together with subsequent @charset definitions
-            // a comment (or @media statement) before the actual @charset directive would
+            // a comment (or @media statement) before the actual @charset atrule would
             // be considered illegal css as it has to be on the first line
             if (this.charset) {
-                if (directiveNode.debugInfo) {
-                    var comment = new tree.Comment("/* " + directiveNode.toCSS(this._context).replace(/\n/g, "") + " */\n");
-                    comment.debugInfo = directiveNode.debugInfo;
+                if (atRuleNode.debugInfo) {
+                    const comment = new tree.Comment(`/* ${atRuleNode.toCSS(this._context).replace(/\n/g, '')} */\n`);
+                    comment.debugInfo = atRuleNode.debugInfo;
                     return this._visitor.visit(comment);
                 }
                 return;
@@ -195,7 +192,7 @@ ToCSSVisitor.prototype = {
             this.charset = true;
         }
 
-        return directiveNode;
+        return atRuleNode;
     },
 
     checkValidNodes: function(rules, isRoot) {
@@ -203,36 +200,40 @@ ToCSSVisitor.prototype = {
             return;
         }
 
-        for (var i = 0; i < rules.length; i++) {
-            var ruleNode = rules[i];
-            if (isRoot && ruleNode instanceof tree.Rule && !ruleNode.variable) {
-                throw { message: "Properties must be inside selector blocks. They cannot be in the root",
-                    index: ruleNode.index, filename: ruleNode.currentFileInfo && ruleNode.currentFileInfo.filename};
+        for (let i = 0; i < rules.length; i++) {
+            const ruleNode = rules[i];
+            if (isRoot && ruleNode instanceof tree.Declaration && !ruleNode.variable) {
+                throw { message: 'Properties must be inside selector blocks. They cannot be in the root',
+                    index: ruleNode.getIndex(), filename: ruleNode.fileInfo() && ruleNode.fileInfo().filename};
             }
             if (ruleNode instanceof tree.Call) {
-                throw { message: "Function '" + ruleNode.name + "' is undefined",
-                    index: ruleNode.index, filename: ruleNode.currentFileInfo && ruleNode.currentFileInfo.filename};
+                throw { message: `Function '${ruleNode.name}' is undefined`,
+                    index: ruleNode.getIndex(), filename: ruleNode.fileInfo() && ruleNode.fileInfo().filename};
             }
             if (ruleNode.type && !ruleNode.allowRoot) {
-                throw { message: ruleNode.type + " node returned by a function is not valid here",
-                    index: ruleNode.index, filename: ruleNode.currentFileInfo && ruleNode.currentFileInfo.filename};
+                throw { message: `${ruleNode.type} node returned by a function is not valid here`,
+                    index: ruleNode.getIndex(), filename: ruleNode.fileInfo() && ruleNode.fileInfo().filename};
             }
         }
     },
 
     visitRuleset: function (rulesetNode, visitArgs) {
-        //at this point rulesets are nested into each other
-        var rule, rulesets = [];
+        // at this point rulesets are nested into each other
+        let rule;
+
+        const rulesets = [];
 
         this.checkValidNodes(rulesetNode.rules, rulesetNode.firstRoot);
 
-        if (! rulesetNode.root) {
-            //remove invisible paths
+        if (!rulesetNode.root) {
+            // remove invisible paths
             this._compileRulesetPaths(rulesetNode);
 
             // remove rulesets from this ruleset body and compile them separately
-            var nodeRules = rulesetNode.rules, nodeRuleCnt = nodeRules ? nodeRules.length : 0;
-            for (var i = 0; i < nodeRuleCnt; ) {
+            const nodeRules = rulesetNode.rules;
+
+            let nodeRuleCnt = nodeRules ? nodeRules.length : 0;
+            for (let i = 0; i < nodeRuleCnt; ) {
                 rule = nodeRules[i];
                 if (rule && rule.rules) {
                     // visit because we are moving them out from being a child
@@ -252,8 +253,7 @@ ToCSSVisitor.prototype = {
                 rulesetNode.rules = null;
             }
             visitArgs.visitDeeper = false;
-
-        } else { //if (! rulesetNode.root) {
+        } else { // if (! rulesetNode.root) {
             rulesetNode.accept(this._visitor);
             visitArgs.visitDeeper = false;
         }
@@ -263,7 +263,7 @@ ToCSSVisitor.prototype = {
             this._removeDuplicateRules(rulesetNode.rules);
         }
 
-        //now decide whether we keep the ruleset
+        // now decide whether we keep the ruleset
         if (this.utils.isVisibleRuleset(rulesetNode)) {
             rulesetNode.ensureVisibility();
             rulesets.splice(0, 0, rulesetNode);
@@ -278,8 +278,8 @@ ToCSSVisitor.prototype = {
     _compileRulesetPaths: function(rulesetNode) {
         if (rulesetNode.paths) {
             rulesetNode.paths = rulesetNode.paths
-                .filter(function(p) {
-                    var i;
+                .filter(p => {
+                    let i;
                     if (p[0].elements[0].combinator.value === ' ') {
                         p[0].elements[0].combinator = new(tree.Combinator)('');
                     }
@@ -297,20 +297,23 @@ ToCSSVisitor.prototype = {
         if (!rules) { return; }
 
         // remove duplicates
-        var ruleCache = {},
-            ruleList, rule, i;
+        const ruleCache = {};
+
+        let ruleList;
+        let rule;
+        let i;
 
         for (i = rules.length - 1; i >= 0 ; i--) {
             rule = rules[i];
-            if (rule instanceof tree.Rule) {
+            if (rule instanceof tree.Declaration) {
                 if (!ruleCache[rule.name]) {
                     ruleCache[rule.name] = rule;
                 } else {
                     ruleList = ruleCache[rule.name];
-                    if (ruleList instanceof tree.Rule) {
+                    if (ruleList instanceof tree.Declaration) {
                         ruleList = ruleCache[rule.name] = [ruleCache[rule.name].toCSS(this._context)];
                     }
-                    var ruleCSS = rule.toCSS(this._context);
+                    const ruleCSS = rule.toCSS(this._context);
                     if (ruleList.indexOf(ruleCSS) !== -1) {
                         rules.splice(i, 1);
                     } else {
@@ -321,73 +324,40 @@ ToCSSVisitor.prototype = {
         }
     },
 
-    _mergeRules: function (rules) {
-        if (!rules) { return; }
+    _mergeRules: function(rules) {
+        if (!rules) {
+            return; 
+        }
 
-        var groups = {},
-            parts,
-            rule,
-            key;
+        const groups    = {};
+        const groupsArr = [];
 
-        for (var i = 0; i < rules.length; i++) {
-            rule = rules[i];
-
-            if ((rule instanceof tree.Rule) && rule.merge) {
-                key = [rule.name,
-                    rule.important ? "!" : ""].join(",");
-
-                if (!groups[key]) {
-                    groups[key] = [];
-                } else {
-                    rules.splice(i--, 1);
-                }
-
+        for (let i = 0; i < rules.length; i++) {
+            const rule = rules[i];
+            if (rule.merge) {
+                const key = rule.name;
+                groups[key] ? rules.splice(i--, 1) : 
+                    groupsArr.push(groups[key] = []);
                 groups[key].push(rule);
             }
         }
 
-        Object.keys(groups).map(function (k) {
-
-            function toExpression(values) {
-                return new (tree.Expression)(values.map(function (p) {
-                    return p.value;
-                }));
-            }
-
-            function toValue(values) {
-                return new (tree.Value)(values.map(function (p) {
-                    return p;
-                }));
-            }
-
-            parts = groups[k];
-
-            if (parts.length > 1) {
-                rule = parts[0];
-                var spacedGroups = [];
-                var lastSpacedGroup = [];
-                parts.map(function (p) {
-                    if (p.merge === "+") {
-                        if (lastSpacedGroup.length > 0) {
-                            spacedGroups.push(toExpression(lastSpacedGroup));
-                        }
-                        lastSpacedGroup = [];
+        groupsArr.forEach(group => {
+            if (group.length > 0) {
+                const result = group[0];
+                let space  = [];
+                const comma  = [new tree.Expression(space)];
+                group.forEach(rule => {
+                    if ((rule.merge === '+') && (space.length > 0)) {
+                        comma.push(new tree.Expression(space = []));
                     }
-                    lastSpacedGroup.push(p);
+                    space.push(rule.value);
+                    result.important = result.important || rule.important;
                 });
-                spacedGroups.push(toExpression(lastSpacedGroup));
-                rule.value = toValue(spacedGroups);
+                result.value = new tree.Value(comma);
             }
         });
-    },
-
-    visitAnonymous: function(anonymousNode, visitArgs) {
-        if (anonymousNode.blocksVisibility()) {
-            return ;
-        }
-        anonymousNode.accept(this._visitor);
-        return anonymousNode;
     }
 };
 
-module.exports = ToCSSVisitor;
+export default ToCSSVisitor;

@@ -1,8 +1,9 @@
-var contexts = require("../contexts"),
-    Visitor = require("./visitor"),
-    ImportSequencer = require("./import-sequencer");
+import contexts from '../contexts';
+import Visitor from './visitor';
+import ImportSequencer from './import-sequencer';
+import * as utils from '../utils';
 
-var ImportVisitor = function(importer, finish) {
+const ImportVisitor = function(importer, finish) {
 
     this._visitor = new Visitor(this);
     this._importer = importer;
@@ -21,7 +22,7 @@ ImportVisitor.prototype = {
             // process the contents
             this._visitor.visit(root);
         }
-        catch(e) {
+        catch (e) {
             this.error = e;
         }
 
@@ -35,12 +36,12 @@ ImportVisitor.prototype = {
         this._finish(this.error);
     },
     visitImport: function (importNode, visitArgs) {
-        var inlineCSS = importNode.options.inline;
+        const inlineCSS = importNode.options.inline;
 
         if (!importNode.css || inlineCSS) {
 
-            var context = new contexts.Eval(this.context, this.context.frames.slice(0));
-            var importParent = context.frames[0];
+            const context = new contexts.Eval(this.context, utils.copyArray(this.context.frames));
+            const importParent = context.frames[0];
 
             this.importCount++;
             if (importNode.isVariableImport()) {
@@ -52,13 +53,13 @@ ImportVisitor.prototype = {
         visitArgs.visitDeeper = false;
     },
     processImportNode: function(importNode, context, importParent) {
-        var evaldImportNode,
-            inlineCSS = importNode.options.inline;
+        let evaldImportNode;
+        const inlineCSS = importNode.options.inline;
 
         try {
             evaldImportNode = importNode.evalForImport(context);
-        } catch(e) {
-            if (!e.filename) { e.index = importNode.index; e.filename = importNode.currentFileInfo.filename; }
+        } catch (e) {
+            if (!e.filename) { e.index = importNode.getIndex(); e.filename = importNode.fileInfo().filename; }
             // attempt to eval properly and treat as css
             importNode.css = true;
             // if that fails, this error will be thrown
@@ -66,25 +67,24 @@ ImportVisitor.prototype = {
         }
 
         if (evaldImportNode && (!evaldImportNode.css || inlineCSS)) {
-
             if (evaldImportNode.options.multiple) {
                 context.importMultiple = true;
             }
 
             // try appending if we haven't determined if it is css or not
-            var tryAppendLessExtension = evaldImportNode.css === undefined;
+            const tryAppendLessExtension = evaldImportNode.css === undefined;
 
-            for (var i = 0; i < importParent.rules.length; i++) {
+            for (let i = 0; i < importParent.rules.length; i++) {
                 if (importParent.rules[i] === importNode) {
                     importParent.rules[i] = evaldImportNode;
                     break;
                 }
             }
 
-            var onImported = this.onImported.bind(this, evaldImportNode, context),
-                sequencedOnImported = this._sequencer.addImport(onImported);
+            const onImported = this.onImported.bind(this, evaldImportNode, context);
+            const sequencedOnImported = this._sequencer.addImport(onImported);
 
-            this._importer.push(evaldImportNode.getPath(), tryAppendLessExtension, evaldImportNode.currentFileInfo,
+            this._importer.push(evaldImportNode.getPath(), tryAppendLessExtension, evaldImportNode.fileInfo(),
                 evaldImportNode.options, sequencedOnImported);
         } else {
             this.importCount--;
@@ -96,22 +96,22 @@ ImportVisitor.prototype = {
     onImported: function (importNode, context, e, root, importedAtRoot, fullPath) {
         if (e) {
             if (!e.filename) {
-                e.index = importNode.index; e.filename = importNode.currentFileInfo.filename;
+                e.index = importNode.getIndex(); e.filename = importNode.fileInfo().filename;
             }
             this.error = e;
         }
 
-        var importVisitor = this,
-            inlineCSS = importNode.options.inline,
-            isPlugin = importNode.options.plugin,
-            isOptional = importNode.options.optional,
-            duplicateImport = importedAtRoot || fullPath in importVisitor.recursionDetector;
+        const importVisitor = this;
+        const inlineCSS = importNode.options.inline;
+        const isPlugin = importNode.options.isPlugin;
+        const isOptional = importNode.options.optional;
+        const duplicateImport = importedAtRoot || fullPath in importVisitor.recursionDetector;
 
         if (!context.importMultiple) {
             if (duplicateImport) {
                 importNode.skip = true;
             } else {
-                importNode.skip = function() {
+                importNode.skip = () => {
                     if (fullPath in importVisitor.onceFileDetectionMap) {
                         return true;
                     }
@@ -132,7 +132,7 @@ ImportVisitor.prototype = {
             if (!inlineCSS && !isPlugin && (context.importMultiple || !duplicateImport)) {
                 importVisitor.recursionDetector[fullPath] = true;
 
-                var oldContext = this.context;
+                const oldContext = this.context;
                 this.context = context;
                 try {
                     this._visitor.visit(root);
@@ -149,22 +149,22 @@ ImportVisitor.prototype = {
             importVisitor._sequencer.tryRun();
         }
     },
-    visitRule: function (ruleNode, visitArgs) {
-        if (ruleNode.value.type === "DetachedRuleset") {
-            this.context.frames.unshift(ruleNode);
+    visitDeclaration: function (declNode, visitArgs) {
+        if (declNode.value.type === 'DetachedRuleset') {
+            this.context.frames.unshift(declNode);
         } else {
             visitArgs.visitDeeper = false;
         }
     },
-    visitRuleOut : function(ruleNode) {
-        if (ruleNode.value.type === "DetachedRuleset") {
+    visitDeclarationOut: function(declNode) {
+        if (declNode.value.type === 'DetachedRuleset') {
             this.context.frames.shift();
         }
     },
-    visitDirective: function (directiveNode, visitArgs) {
-        this.context.frames.unshift(directiveNode);
+    visitAtRule: function (atRuleNode, visitArgs) {
+        this.context.frames.unshift(atRuleNode);
     },
-    visitDirectiveOut: function (directiveNode) {
+    visitAtRuleOut: function (atRuleNode) {
         this.context.frames.shift();
     },
     visitMixinDefinition: function (mixinDefinitionNode, visitArgs) {
@@ -186,4 +186,4 @@ ImportVisitor.prototype = {
         this.context.frames.shift();
     }
 };
-module.exports = ImportVisitor;
+export default ImportVisitor;

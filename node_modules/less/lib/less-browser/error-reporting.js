@@ -1,22 +1,25 @@
-var utils = require("./utils"),
-    browser = require("./browser");
+import * as utils from './utils';
+import browser from './browser';
 
-module.exports = function(window, less, options) {
+export default (window, less, options) => {
 
     function errorHTML(e, rootHref) {
-        var id = 'less-error-message:' + utils.extractId(rootHref || "");
-        var template = '<li><label>{line}</label><pre class="{class}">{content}</pre></li>';
-        var elem = window.document.createElement('div'), timer, content, errors = [];
-        var filename = e.filename || rootHref;
-        var filenameNoPath = filename.match(/([^\/]+(\?.*)?)$/)[1];
+        const id = `less-error-message:${utils.extractId(rootHref || '')}`;
+        const template = '<li><label>{line}</label><pre class="{class}">{content}</pre></li>';
+        const elem = window.document.createElement('div');
+        let timer;
+        let content;
+        const errors = [];
+        const filename = e.filename || rootHref;
+        const filenameNoPath = filename.match(/([^\/]+(\?.*)?)$/)[1];
 
         elem.id        = id;
-        elem.className = "less-error-message";
+        elem.className = 'less-error-message';
 
-        content = '<h3>'  + (e.type || "Syntax") + "Error: " + (e.message || 'There is an error in your .less file') +
-            '</h3>' + '<p>in <a href="' + filename   + '">' + filenameNoPath + "</a> ";
+        content = `<h3>${e.type || 'Syntax'}Error: ${e.message || 'There is an error in your .less file'}` + 
+            `</h3><p>in <a href="${filename}">${filenameNoPath}</a> `;
 
-        var errorline = function (e, i, classname) {
+        const errorline = (e, i, classname) => {
             if (e.extract[i] !== undefined) {
                 errors.push(template.replace(/\{line\}/, (parseInt(e.line, 10) || 0) + (i - 1))
                     .replace(/\{class\}/, classname)
@@ -24,15 +27,14 @@ module.exports = function(window, less, options) {
             }
         };
 
-        if (e.extract) {
+        if (e.line) {
             errorline(e, 0, '');
             errorline(e, 1, 'line');
             errorline(e, 2, '');
-            content += 'on line ' + e.line + ', column ' + (e.column + 1) + ':</p>' +
-                '<ul>' + errors.join('') + '</ul>';
+            content += `on line ${e.line}, column ${e.column + 1}:</p><ul>${errors.join('')}</ul>`;
         }
         if (e.stack && (e.extract || options.logLevel >= 4)) {
-            content += '<br/>Stack Trace</br />' + e.stack.split('\n').slice(1).join('<br/>');
+            content += `<br/>Stack Trace</br />${e.stack.split('\n').slice(1).join('<br/>')}`;
         }
         elem.innerHTML = content;
 
@@ -77,21 +79,21 @@ module.exports = function(window, less, options) {
         ].join('\n'), { title: 'error-message' });
 
         elem.style.cssText = [
-            "font-family: Arial, sans-serif",
-            "border: 1px solid #e00",
-            "background-color: #eee",
-            "border-radius: 5px",
-            "-webkit-border-radius: 5px",
-            "-moz-border-radius: 5px",
-            "color: #e00",
-            "padding: 15px",
-            "margin-bottom: 15px"
+            'font-family: Arial, sans-serif',
+            'border: 1px solid #e00',
+            'background-color: #eee',
+            'border-radius: 5px',
+            '-webkit-border-radius: 5px',
+            '-moz-border-radius: 5px',
+            'color: #e00',
+            'padding: 15px',
+            'margin-bottom: 15px'
         ].join(';');
 
         if (options.env === 'development') {
-            timer = setInterval(function () {
-                var document = window.document,
-                    body = document.body;
+            timer = setInterval(() => {
+                const document = window.document;
+                const body = document.body;
                 if (body) {
                     if (document.getElementById(id)) {
                         body.replaceChild(elem, document.getElementById(id));
@@ -105,34 +107,33 @@ module.exports = function(window, less, options) {
     }
 
     function removeErrorHTML(path) {
-        var node = window.document.getElementById('less-error-message:' + utils.extractId(path));
+        const node = window.document.getElementById(`less-error-message:${utils.extractId(path)}`);
         if (node) {
             node.parentNode.removeChild(node);
         }
     }
 
     function removeErrorConsole(path) {
-        //no action
+        // no action
     }
 
     function removeError(path) {
-        if (!options.errorReporting || options.errorReporting === "html") {
+        if (!options.errorReporting || options.errorReporting === 'html') {
             removeErrorHTML(path);
-        } else if (options.errorReporting === "console") {
+        } else if (options.errorReporting === 'console') {
             removeErrorConsole(path);
         } else if (typeof options.errorReporting === 'function') {
-            options.errorReporting("remove", path);
+            options.errorReporting('remove', path);
         }
     }
 
     function errorConsole(e, rootHref) {
-        var template = '{line} {content}';
-        var filename = e.filename || rootHref;
-        var errors = [];
-        var content = (e.type || "Syntax") + "Error: " + (e.message || 'There is an error in your .less file') +
-            " in " + filename + " ";
+        const template = '{line} {content}';
+        const filename = e.filename || rootHref;
+        const errors = [];
+        let content = `${e.type || 'Syntax'}Error: ${e.message || 'There is an error in your .less file'} in ${filename}`;
 
-        var errorline = function (e, i, classname) {
+        const errorline = (e, i, classname) => {
             if (e.extract[i] !== undefined) {
                 errors.push(template.replace(/\{line\}/, (parseInt(e.line, 10) || 0) + (i - 1))
                     .replace(/\{class\}/, classname)
@@ -140,26 +141,25 @@ module.exports = function(window, less, options) {
             }
         };
 
-        if (e.extract) {
+        if (e.line) {
             errorline(e, 0, '');
             errorline(e, 1, 'line');
             errorline(e, 2, '');
-            content += 'on line ' + e.line + ', column ' + (e.column + 1) + ':\n' +
-                errors.join('\n');
+            content += ` on line ${e.line}, column ${e.column + 1}:\n${errors.join('\n')}`;
         }
         if (e.stack && (e.extract || options.logLevel >= 4)) {
-            content += '\nStack Trace\n' + e.stack;
+            content += `\nStack Trace\n${e.stack}`;
         }
         less.logger.error(content);
     }
 
     function error(e, rootHref) {
-        if (!options.errorReporting || options.errorReporting === "html") {
+        if (!options.errorReporting || options.errorReporting === 'html') {
             errorHTML(e, rootHref);
-        } else if (options.errorReporting === "console") {
+        } else if (options.errorReporting === 'console') {
             errorConsole(e, rootHref);
         } else if (typeof options.errorReporting === 'function') {
-            options.errorReporting("add", e, rootHref);
+            options.errorReporting('add', e, rootHref);
         }
     }
 

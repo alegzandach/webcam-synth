@@ -8,6 +8,14 @@
   width: (@z + 1cm); // 14cm
 }
 
+.variable-dash {
+    @jumbotron-padding: 30px;
+
+    .q {
+        padding: @jumbotron-padding (@jumbotron-padding/2);
+    }
+}
+
 @b: @a * 10;
 @c: #888;
 
@@ -78,7 +86,7 @@
 .polluteMixin() {
     @a: 'pollution';
 }
-.testPollution {
+.test-rulePollution {
     @a: 'no-pollution';
     a: @a;
     .polluteMixin();

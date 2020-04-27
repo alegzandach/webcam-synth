@@ -7,23 +7,29 @@ function makeRegistry( base ) {
             name = name.toLowerCase();
 
             if (this._data.hasOwnProperty(name)) {
-                //TODO warn
+                // TODO warn
             }
             this._data[name] = func;
         },
         addMultiple: function(functions) {
             Object.keys(functions).forEach(
-                function(name) {
+                name => {
                     this.add(name, functions[name]);
-                }.bind(this));
+                });
         },
         get: function(name) {
             return this._data[name] || ( base && base.get( name ));
         },
-        inherit : function() {
+        getLocalFunctions: function() {
+            return this._data;
+        },
+        inherit: function() {
             return makeRegistry( this );
+        },
+        create: function(base) {
+            return makeRegistry(base);
         }
     };
 }
 
-module.exports = makeRegistry( null );
+export default makeRegistry( null );

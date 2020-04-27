@@ -1,0 +1,6 @@
+<img [hidden]="true" #img rel:animated_src="../../../assets/gov.gif">
+<div style="text-align: center;">
+    <div *ngIf="!playing" (click)="play()" style="">PLAY</div>
+    <div *ngIf="playing" (click)="pause()">PAUSE</div>
+</div>
+

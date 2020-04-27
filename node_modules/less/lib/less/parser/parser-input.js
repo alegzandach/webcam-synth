@@ -1,32 +1,50 @@
-var chunker = require('./chunker');
+import chunker from './chunker';
 
-module.exports = function() {
-    var input,       // LeSS input string
-        j,           // current chunk
-        saveStack = [],   // holds state for backtracking
-        furthest,    // furthest index the parser has gone to
-        furthestPossibleErrorMessage,// if this is furthest we got to, this is the probably cause
-        chunks,      // chunkified input
-        current,     // current chunk
-        currentPos,  // index of current chunk, in `input`
-        parserInput = {};
+export default () => {
+    let // Less input string
+        input;
 
-    var CHARCODE_SPACE = 32,
-        CHARCODE_TAB = 9,
-        CHARCODE_LF = 10,
-        CHARCODE_CR = 13,
-        CHARCODE_PLUS = 43,
-        CHARCODE_COMMA = 44,
-        CHARCODE_FORWARD_SLASH = 47,
-        CHARCODE_9 = 57;
+    let // current chunk
+        j;
+
+    const // holds state for backtracking
+        saveStack = [];
+
+    let // furthest index the parser has gone to
+        furthest;
+
+    let // if this is furthest we got to, this is the probably cause
+        furthestPossibleErrorMessage;
+
+    let // chunkified input
+        chunks;
+
+    let // current chunk
+        current;
+
+    let // index of current chunk, in `input`
+        currentPos;
+
+    const parserInput = {};
+    const CHARCODE_SPACE = 32;
+    const CHARCODE_TAB = 9;
+    const CHARCODE_LF = 10;
+    const CHARCODE_CR = 13;
+    const CHARCODE_PLUS = 43;
+    const CHARCODE_COMMA = 44;
+    const CHARCODE_FORWARD_SLASH = 47;
+    const CHARCODE_9 = 57;
 
     function skipWhitespace(length) {
-        var oldi = parserInput.i, oldj = j,
-            curr = parserInput.i - currentPos,
-            endIndex = parserInput.i + current.length - curr,
-            mem = (parserInput.i += length),
-            inp = input,
-            c, nextChar, comment;
+        const oldi = parserInput.i;
+        const oldj = j;
+        const curr = parserInput.i - currentPos;
+        const endIndex = parserInput.i + current.length - curr;
+        const mem = (parserInput.i += length);
+        const inp = input;
+        let c;
+        let nextChar;
+        let comment;
 
         for (; parserInput.i < endIndex; parserInput.i++) {
             c = inp.charCodeAt(parserInput.i);
@@ -35,7 +53,7 @@ module.exports = function() {
                 nextChar = inp.charAt(parserInput.i + 1);
                 if (nextChar === '/') {
                     comment = {index: parserInput.i, isLineComment: true};
-                    var nextNewLine = inp.indexOf("\n", parserInput.i + 2);
+                    let nextNewLine = inp.indexOf('\n', parserInput.i + 2);
                     if (nextNewLine < 0) {
                         nextNewLine = endIndex;
                     }
@@ -44,7 +62,7 @@ module.exports = function() {
                     parserInput.commentStore.push(comment);
                     continue;
                 } else if (nextChar === '*') {
-                    var nextStarSlash = inp.indexOf("*/", parserInput.i + 2);
+                    const nextStarSlash = inp.indexOf('*/', parserInput.i + 2);
                     if (nextStarSlash >= 0) {
                         comment = {
                             index: parserInput.i,
@@ -79,51 +97,51 @@ module.exports = function() {
         return oldi !== parserInput.i || oldj !== j;
     }
 
-    parserInput.save = function() {
+    parserInput.save = () => {
         currentPos = parserInput.i;
-        saveStack.push( { current: current, i: parserInput.i, j: j });
+        saveStack.push( { current, i: parserInput.i, j });
     };
-    parserInput.restore = function(possibleErrorMessage) {
+    parserInput.restore = possibleErrorMessage => {
 
         if (parserInput.i > furthest || (parserInput.i === furthest && possibleErrorMessage && !furthestPossibleErrorMessage)) {
             furthest = parserInput.i;
             furthestPossibleErrorMessage = possibleErrorMessage;
         }
-        var state = saveStack.pop();
+        const state = saveStack.pop();
         current = state.current;
         currentPos = parserInput.i = state.i;
         j = state.j;
     };
-    parserInput.forget = function() {
+    parserInput.forget = () => {
         saveStack.pop();
     };
-    parserInput.isWhitespace = function (offset) {
-        var pos = parserInput.i + (offset || 0),
-            code = input.charCodeAt(pos);
+    parserInput.isWhitespace = offset => {
+        const pos = parserInput.i + (offset || 0);
+        const code = input.charCodeAt(pos);
         return (code === CHARCODE_SPACE || code === CHARCODE_CR || code === CHARCODE_TAB || code === CHARCODE_LF);
     };
 
     // Specialization of $(tok)
-    parserInput.$re = function(tok) {
+    parserInput.$re = tok => {
         if (parserInput.i > currentPos) {
             current = current.slice(parserInput.i - currentPos);
             currentPos = parserInput.i;
         }
 
-        var m = tok.exec(current);
+        const m = tok.exec(current);
         if (!m) {
             return null;
         }
 
         skipWhitespace(m[0].length);
-        if (typeof m === "string") {
+        if (typeof m === 'string') {
             return m;
         }
 
         return m.length === 1 ? m[0] : m;
     };
 
-    parserInput.$char = function(tok) {
+    parserInput.$char = tok => {
         if (input.charAt(parserInput.i) !== tok) {
             return null;
         }
@@ -131,11 +149,11 @@ module.exports = function() {
         return tok;
     };
 
-    parserInput.$str = function(tok) {
-        var tokLength = tok.length;
+    parserInput.$str = tok => {
+        const tokLength = tok.length;
 
         // https://jsperf.com/string-startswith/21
-        for (var i = 0; i < tokLength; i++) {
+        for (let i = 0; i < tokLength; i++) {
             if (input.charAt(parserInput.i + i) !== tok.charAt(i)) {
                 return null;
             }
@@ -145,33 +163,150 @@ module.exports = function() {
         return tok;
     };
 
-    parserInput.$quoted = function() {
+    parserInput.$quoted = loc => {
+        const pos = loc || parserInput.i;
+        const startChar = input.charAt(pos);
 
-        var startChar = input.charAt(parserInput.i);
-        if (startChar !== "'" && startChar !== '"') {
+        if (startChar !== '\'' && startChar !== '"') {
             return;
         }
-        var length = input.length,
-            currentPosition = parserInput.i;
+        const length = input.length;
+        const currentPosition = pos;
 
-        for (var i = 1; i + currentPosition < length; i++) {
-            var nextChar = input.charAt(i + currentPosition);
-            switch(nextChar) {
-                case "\\":
+        for (let i = 1; i + currentPosition < length; i++) {
+            const nextChar = input.charAt(i + currentPosition);
+            switch (nextChar) {
+                case '\\':
                     i++;
                     continue;
-                case "\r":
-                case "\n":
+                case '\r':
+                case '\n':
                     break;
                 case startChar:
-                    var str = input.substr(currentPosition, i + 1);
-                    skipWhitespace(i + 1);
-                    return str;
+                    const str = input.substr(currentPosition, i + 1);
+                    if (!loc && loc !== 0) {
+                        skipWhitespace(i + 1);
+                        return str
+                    }
+                    return [startChar, str];
                 default:
             }
         }
         return null;
     };
+
+    /**
+     * Permissive parsing. Ignores everything except matching {} [] () and quotes
+     * until matching token (outside of blocks)
+     */
+    parserInput.$parseUntil = tok => {
+        let quote = '';
+        let returnVal = null;
+        let inComment = false;
+        let blockDepth = 0;
+        const blockStack = [];
+        const parseGroups = [];
+        const length = input.length;
+        const startPos = parserInput.i;
+        let lastPos = parserInput.i;
+        let i = parserInput.i;
+        let loop = true;
+        let testChar;
+
+        if (typeof tok === 'string') {
+            testChar = char => char === tok
+        } else {
+            testChar = char => tok.test(char)
+        }
+
+        do {
+            let prevChar;
+            let nextChar = input.charAt(i);
+            if (blockDepth === 0 && testChar(nextChar)) {
+                returnVal = input.substr(lastPos, i - lastPos);
+                if (returnVal) {
+                    parseGroups.push(returnVal);
+                }
+                else {
+                    parseGroups.push(' ');
+                }
+                returnVal = parseGroups;
+                skipWhitespace(i - startPos);
+                loop = false
+            } else {
+                if (inComment) {
+                    if (nextChar === '*' && 
+                        input.charAt(i + 1) === '/') {
+                        i++;
+                        blockDepth--;
+                        inComment = false;
+                    }
+                    i++;
+                    continue;
+                }
+                switch (nextChar) {
+                    case '\\':
+                        i++;
+                        nextChar = input.charAt(i);
+                        parseGroups.push(input.substr(lastPos, i - lastPos + 1));
+                        lastPos = i + 1;
+                        break;
+                    case '/':
+                        if (input.charAt(i + 1) === '*') {
+                            i++;
+                            inComment = true;
+                            blockDepth++;
+                        }
+                        break;
+                    case '\'':
+                    case '"':
+                        quote = parserInput.$quoted(i);
+                        if (quote) {
+                            parseGroups.push(input.substr(lastPos, i - lastPos), quote);
+                            i += quote[1].length - 1;
+                            lastPos = i + 1;
+                        }
+                        else {
+                            skipWhitespace(i - startPos);
+                            returnVal = nextChar;
+                            loop = false;
+                        }
+                        break;
+                    case '{':
+                        blockStack.push('}');
+                        blockDepth++;
+                        break;
+                    case '(':
+                        blockStack.push(')');
+                        blockDepth++;
+                        break;
+                    case '[':
+                        blockStack.push(']');
+                        blockDepth++;
+                        break;
+                    case '}':
+                    case ')':
+                    case ']':
+                        const expected = blockStack.pop();
+                        if (nextChar === expected) {
+                            blockDepth--;
+                        } else {
+                            // move the parser to the error and return expected
+                            skipWhitespace(i - startPos);
+                            returnVal = expected;
+                            loop = false;
+                        }
+                }
+                i++;
+                if (i > length) {
+                    loop = false;
+                }
+            }
+            prevChar = nextChar;
+        } while (loop);
+
+        return returnVal ? returnVal : null;
+    }
 
     parserInput.autoCommentAbsorb = true;
     parserInput.commentStore = [];
@@ -179,10 +314,10 @@ module.exports = function() {
 
     // Same as $(), but don't change the state of the parser,
     // just return the match.
-    parserInput.peek = function(tok) {
+    parserInput.peek = tok => {
         if (typeof tok === 'string') {
             // https://jsperf.com/string-startswith/21
-            for (var i = 0; i < tok.length; i++) {
+            for (let i = 0; i < tok.length; i++) {
                 if (input.charAt(parserInput.i + i) !== tok.charAt(i)) {
                     return false;
                 }
@@ -195,25 +330,21 @@ module.exports = function() {
 
     // Specialization of peek()
     // TODO remove or change some currentChar calls to peekChar
-    parserInput.peekChar = function(tok) {
-        return input.charAt(parserInput.i) === tok;
-    };
+    parserInput.peekChar = tok => input.charAt(parserInput.i) === tok;
 
-    parserInput.currentChar = function() {
-        return input.charAt(parserInput.i);
-    };
+    parserInput.currentChar = () => input.charAt(parserInput.i);
 
-    parserInput.getInput = function() {
-        return input;
-    };
+    parserInput.prevChar = () => input.charAt(parserInput.i - 1);
 
-    parserInput.peekNotNumeric = function() {
-        var c = input.charCodeAt(parserInput.i);
-        //Is the first char of the dimension 0-9, '.', '+' or '-'
+    parserInput.getInput = () => input;
+
+    parserInput.peekNotNumeric = () => {
+        const c = input.charCodeAt(parserInput.i);
+        // Is the first char of the dimension 0-9, '.', '+' or '-'
         return (c > CHARCODE_9 || c < CHARCODE_PLUS) || c === CHARCODE_FORWARD_SLASH || c === CHARCODE_COMMA;
     };
 
-    parserInput.start = function(str, chunkInput, failFunction) {
+    parserInput.start = (str, chunkInput, failFunction) => {
         input = str;
         parserInput.i = j = currentPos = furthest = 0;
 
@@ -238,16 +369,16 @@ module.exports = function() {
         skipWhitespace(0);
     };
 
-    parserInput.end = function() {
-        var message,
-            isFinished = parserInput.i >= input.length;
+    parserInput.end = () => {
+        let message;
+        const isFinished = parserInput.i >= input.length;
 
         if (parserInput.i < furthest) {
             message = furthestPossibleErrorMessage;
             parserInput.i = furthest;
         }
         return {
-            isFinished: isFinished,
+            isFinished,
             furthest: parserInput.i,
             furthestPossibleErrorMessage: message,
             furthestReachedEnd: parserInput.i >= input.length - 1,

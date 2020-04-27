@@ -1,4 +1,4 @@
-/*jshint latedef: nofunc */
+/* jshint latedef: nofunc */
 
 // This is used to copy a folder (the test/less/* files & sub-folders), adding a BOM to the start of each LESS and CSS file.
 // This is a based on the copySync method from fs-extra (https://github.com/jprichardson/node-fs-extra/).
@@ -8,7 +8,8 @@ module.exports = function() {
         fs = require('fs');
 
     var BUF_LENGTH = 64 * 1024;
-    var _buff = new Buffer(BUF_LENGTH);
+    // Avoid Buffer constructor on newer versions of Node.js
+    var _buff = (Buffer.alloc ? Buffer.alloc(BUF_LENGTH) : (new Buffer(BUF_LENGTH)));
 
     function copyFolderWithBom(src, dest) {
         var stats = fs.lstatSync(src);
