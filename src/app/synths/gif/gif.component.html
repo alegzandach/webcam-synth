@@ -1,6 +1,6 @@
-<img [hidden]="true" #img rel:animated_src="../../../assets/gov.gif">
+<img [hidden]="true" #img rel:animated_src="https://media.giphy.com/media/jqI526U1I2UviF5teY/giphy.gif">
 <div style="text-align: center;">
-    <div *ngIf="!playing" (click)="play()" style="">PLAY</div>
-    <div *ngIf="playing" (click)="pause()">PAUSE</div>
+    <div *ngIf="!playing" (click)="play()" style="cursor: pointer">PLAY</div>
+    <div *ngIf="playing" (click)="pause()" style="cursor: pointer">PAUSE</div>
 </div>
 
