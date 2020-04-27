@@ -25,6 +25,7 @@
     "jsgif": "^1.0.2",
     "rxjs": "^6.5.5",
     "rxjs-compat": "^6.0.0-rc.0",
+    "schema-utils": "^2.6.6",
     "tslib": "^1.10.0",
     "zone.js": "~0.10.2"
   },

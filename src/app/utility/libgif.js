@@ -928,7 +928,7 @@
                 ctx.globalCompositeOperation = "copy";
                 ctx.drawImage(tmpCanvas, 0, 0);
                 if (typeof onChangeListener === 'function')
-                    onChangeListener(frames[i].voices);
+                    onChangeListener(frames[i].data);
             };
 
             var play = function () {
@@ -1018,7 +1018,6 @@
 
         var init = function () {
             var parent = gif.parentNode;
-
             var div = document.createElement('div');
             canvas = document.createElement('canvas');
             ctx = canvas.getContext('2d');
@@ -1031,8 +1030,12 @@
             toolbar.style.minWidth = gif.width + 'px';
 
             div.className = 'jsgif';
+            div.id = "canvasContainer"
+            div.style = "text-align: center"
             toolbar.className = 'jsgif_toolbar';
+            canvas.id = 'jsgif_canvas'
             div.appendChild(canvas);
+
             // div.appendChild(toolbar);
 
             if (parent) {
@@ -1046,8 +1049,10 @@
 
         var get_canvas_scale = function() {
             var scale;
-            if (options.max_width && hdr && hdr.width > options.max_width) {
+            if (options.max_width && hdr) {
                 scale = options.max_width / hdr.width;
+            }else if (options.max_height && hdr) {
+                scale = options.max_height / hdr.height;
             }
             else {
                 scale = 1;
