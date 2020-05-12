@@ -33,6 +33,7 @@ var Tone = require('tone/build/Tone');
     public rub;
     public synth;
     public gifCanvas;
+    public gifUrl = ''
     public playing: boolean = false;
 
     @ViewChild('img') img: ElementRef;
@@ -40,20 +41,32 @@ var Tone = require('tone/build/Tone');
 
     public ngAfterViewInit() {
       this.synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
-      this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_height: window.innerHeight*.95, show_progress_bar: false, auto_play: false});
-      this.rub.load();
-      this.gifCanvas = document.getElementById('jsgif_canvas')
+      //this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: window.innerWidth*.95, max_height: window.innerHeight*.95, show_progress_bar: false, auto_play: false});
+      //this.rub.load();
+      //this.gifCanvas = document.getElementById('jsgif_canvas')
     }
 
     public onResize = () => {
       this.rub.load();
       this.gifCanvas = document.getElementById('jsgif_canvas')
-
     }
 
     public play = () => {
       this.rub.play();
       this.playing = true
+    }
+
+    public load = () => {
+      if( this.gifUrl != ''){
+        if ( this.img.nativeElement.attributes[1].nodeValue ){
+          const element = document.getElementById('canvasContainer');
+          element.parentNode.removeChild(element);
+        }  
+        this.img.nativeElement.attributes[1].nodeValue = this.gifUrl;
+        this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: window.innerWidth*.95, max_height: window.innerHeight*.95, show_progress_bar: false, auto_play: false});
+        this.rub.load(this.play);
+        this.gifCanvas = document.getElementById('jsgif_canvas')
+      }
     }
 
     public pause = () => {

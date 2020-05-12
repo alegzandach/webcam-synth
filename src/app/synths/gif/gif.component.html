@@ -1,6 +1,9 @@
-<img [hidden]="true" #img rel:animated_src="../../../assets/gov.gif">
-<div style="text-align: center;">
-    <div *ngIf="!playing" (click)="play()" style="">PLAY</div>
-    <div *ngIf="playing" (click)="pause()">PAUSE</div>
+<div style="display: flex; flex-direction: column; height: 98vh; width: 98vw">
+    <img [hidden]="true" #img rel:animated_src="">
+    <div style="text-align: center;">
+        <input placeholder="GIF URL" [(ngModel)]="gifUrl">
+        <div *ngIf="!playing" (click)="load()" style="cursor: pointer">PLAY</div>
+        <div *ngIf="playing" (click)="pause()" style="cursor: pointer">PAUSE</div>
+    </div>
 </div>
 

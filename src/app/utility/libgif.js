@@ -1031,9 +1031,10 @@
 
             div.className = 'jsgif';
             div.id = "canvasContainer"
-            div.style = "text-align: center"
+            div.style = "text-align: center; flex-grow: 1"
             toolbar.className = 'jsgif_toolbar';
             canvas.id = 'jsgif_canvas'
+            canvas.style = ''
             div.appendChild(canvas);
 
             // div.appendChild(toolbar);
@@ -1049,10 +1050,16 @@
 
         var get_canvas_scale = function() {
             var scale;
-            if (options.max_width && hdr) {
-                scale = options.max_width / hdr.width;
-            }else if (options.max_height && hdr) {
-                scale = options.max_height / hdr.height;
+            var scale1;
+            var scale2;
+            if( hdr ){
+                if (options.max_width) {
+                    scale1 = options.max_width / hdr.width;
+                }
+                if (options.max_height) {
+                    scale2 = options.max_height / hdr.height;
+                }
+                scale = scale1 < scale2 ? scale1 : scale2
             }
             else {
                 scale = 1;
