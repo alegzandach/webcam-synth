@@ -1,8 +1,8 @@
 <div style="display: flex; flex-direction: column; height: 98vh; width: 98vw">
-    <img [hidden]="true" #img rel:animated_src="https://media.giphy.com/media/jqI526U1I2UviF5teY/giphy.gif">
+    <img [hidden]="true" #img rel:animated_src="">
     <div style="text-align: center;">
-        <input [(ngModel)]="gifUrl">
-        <div *ngIf="!playing" (click)="play()" style="cursor: pointer">PLAY</div>
+        <input placeholder="GIF URL" [(ngModel)]="gifUrl">
+        <div *ngIf="!playing" (click)="load()" style="cursor: pointer">PLAY</div>
         <div *ngIf="playing" (click)="pause()" style="cursor: pointer">PAUSE</div>
     </div>
 </div>
