@@ -928,7 +928,7 @@
                 ctx.globalCompositeOperation = "copy";
                 ctx.drawImage(tmpCanvas, 0, 0);
                 if (typeof onChangeListener === 'function')
-                    onChangeListener(frames[i].data);
+                    onChangeListener(frames[i].voices);
             };
 
             var play = function () {

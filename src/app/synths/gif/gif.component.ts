@@ -54,7 +54,7 @@ var Tone = require('tone/build/Tone');
       } else {
         this.showInstructions = true;
         this.currentUrl = ''
-        this.instructions = "sry that one's not gonna work. try copying the GIF Link <a target='_blank' href='https://giphy.com/gifs/philipper-abstract-flash-J56c6H3S7qumk/links'>here</a>"
+        this.instructions = "oops that one's not gonna work. try copying the GIF Link <a target='_blank' href='https://giphy.com/gifs/philipper-abstract-flash-J56c6H3S7qumk/links'>here</a>"
       }
     }
 
@@ -69,23 +69,23 @@ var Tone = require('tone/build/Tone');
 
     public load = () => {
       if( this.gifUrl && this.gifUrl != this.currentUrl) {
-
         this.showLoad = false;
         this.setLoaded(false);
 
         if ( this.img.nativeElement.attributes[1].nodeValue ){
+          this.pause();
           this.img.nativeElement.attributes[1].nodeValue = ''
           const element = document.getElementById('canvasContainer');
           element.parentNode.removeChild(element);
         } 
 
         if ( this.gifUrl.substring(this.gifUrl.length - 4, this.gifUrl.length) === '.gif') {
-          this.updateInstructions('goodUrl') 
-          this.img.nativeElement.attributes[1].nodeValue = this.gifUrl;
-          this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: document.getElementById('bigContainer').clientWidth, max_height: document.getElementById('bigContainer').clientHeight, show_progress_bar: false, auto_play: false});
-          this.rub.load(this.setLoaded(true));
-          this.gifCanvas = document.getElementById('jsgif_canvas')
-          this.currentUrl = this.gifUrl
+            this.updateInstructions('goodUrl') 
+            this.img.nativeElement.attributes[1].nodeValue = this.gifUrl;
+            this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: document.getElementById('bigContainer').clientWidth, max_height: document.getElementById('bigContainer').clientHeight, show_progress_bar: false, auto_play: false});
+            this.rub.load(this.setLoaded(true));
+            this.gifCanvas = document.getElementById('jsgif_canvas')
+            this.currentUrl = this.gifUrl
         } else {
           this.updateInstructions('badUrl')
         }
@@ -98,10 +98,34 @@ var Tone = require('tone/build/Tone');
     }
 
     public onChange = (data) => {
-      var colors = this.getColors(data.data);
-      this.toneGen(colors, 3, 4);
+      //var colors = this.getColors(data.data);
+      this.toneGen(data);
     }
 
+    public toneGen = (voices) => {
+      var i = 0;
+      voices.forEach((element) => {
+        this.synth.voices[i].envelope.attack = (element[1][1]+element[1][1]+element[1][2]+1)/765;
+        this.synth.voices[i].envelope.decay = (element[1][0]+element[1][1]+element[1][2]+1)/765;
+        this.synth.voices[i].envelope.sustain = (element[2][0]+element[2][1]+element[2][2]+1)/765;
+        this.synth.voices[i].envelope.release = (element[3][0]+element[3][1]+element[3][2]+1)/765;
+        i++;
+      })
+      //play a chord
+      const n1 = voices[1][0][0]+voices[1][0][1]+voices[1][0][2];
+      const n2 = voices[1][1][0]+voices[1][1][1]+voices[1][1][2];
+      const n3 = voices[1][2][0]+voices[1][2][1]+voices[1][2][2];
+      const n4 = voices[1][3][0]+voices[1][3][1]+voices[1][3][2];
+      this.synth.triggerAttackRelease([n1/2,n2/2,n3/2,n4/2], '8n');
+      //synth.triggerAttackRelease([150,200,250], '8n')
+      // console.log(n1 + " 1");
+      // console.log(n2 + " 2");
+      // console.log(n3 + " 3");
+      // console.log(n4 + " 4");
+      //this.synth.triggerAttackRelease([voices[0][1][1], voices[1][0][1], voices[1][2][1]], [voices[2][3][2]], '8n');
+    }
+
+    //the following functions are no longer used here, and are done in the library itself
     public getColors = (data) => {
       var rgba = []
       for (var i = 0; i < data.length; i += 4) {
@@ -136,7 +160,7 @@ var Tone = require('tone/build/Tone');
       return avg;
     }
 
-    public toneGen = (rgba, vs, ps) => {
+    public toneGenWithLogic = (rgba, vs, ps) => {
       const sections = this.divyUp(rgba, vs, ps, 360, 240);
       const voices = this.create2DArray([vs,ps]);
       for(let i=0;i<vs;i++){
