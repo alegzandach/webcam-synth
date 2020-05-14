@@ -1,11 +1,13 @@
 <div id="biggestContainer" style="display: flex; flex-direction: column; height: 97vh; width: 98vw">
     <div id="bigContainer" style="flex-grow: 1;">
+        <div [hidden]="!showInstructions" [innerHTML]="instructions" style="text-align: center; margin-top: 25%;"></div>
         <img [hidden]="true" #img rel:animated_src="">
     </div>
     <div style="text-align: center; margin: auto">
-        <input placeholder="GIF URL" [(ngModel)]="gifUrl">
-        <div *ngIf="!playing" (click)="load()" style="cursor: pointer">PLAY</div>
-        <div *ngIf="playing" (click)="pause()" style="cursor: pointer">PAUSE</div>
+        <div *ngIf="!playing && loaded" (click)="play()" style="cursor: pointer">PLAY</div>
+        <div *ngIf="playing && loaded" (click)="pause()" style="cursor: pointer">PAUSE</div>
+        <input placeholder="gif url" [(ngModel)]="gifUrl" (ngModelChange)="showLoad = true">
+        <div *ngIf="showLoad" (click)="load()" style="cursor: pointer">LOAD</div>
     </div>
 </div>
 

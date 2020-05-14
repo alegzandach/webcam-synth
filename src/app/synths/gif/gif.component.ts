@@ -33,9 +33,13 @@ var Tone = require('tone/build/Tone');
     public rub;
     public synth;
     public gifCanvas;
-    public gifUrl = ''
+    public gifUrl = 'https://media.giphy.com/media/J56c6H3S7qumk/giphy.gif'
     public currentUrl = ''
     public playing: boolean = false;
+    public showInstructions: boolean = true;
+    public instructions: string = "feed me a gif url in the box below, or use the one i pre-fed for you"
+    public loaded: boolean = false;
+    public showLoad: boolean = true;
 
     @ViewChild('img') img: ElementRef;
     @ViewChild('gifCanvas') ctx: ElementRef;
@@ -44,24 +48,47 @@ var Tone = require('tone/build/Tone');
       this.synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
     }
 
+    public updateInstructions = (str) => {
+      if ( str === 'goodUrl' ) {
+        this.showInstructions = false;
+      } else {
+        this.showInstructions = true;
+        this.currentUrl = ''
+        this.instructions = "sry that one's not gonna work. try copying the GIF Link <a target='_blank' href='https://giphy.com/gifs/philipper-abstract-flash-J56c6H3S7qumk/links'>here</a>"
+      }
+    }
+
     public play = () => {
       this.rub.play();
       this.playing = true
     }
 
+    public setLoaded = (bool: boolean) => {
+      this.loaded = bool;
+    }
+
     public load = () => {
-      if( this.gifUrl && this.gifUrl != this.currentUrl){
+      if( this.gifUrl && this.gifUrl != this.currentUrl) {
+
+        this.showLoad = false;
+        this.setLoaded(false);
+
         if ( this.img.nativeElement.attributes[1].nodeValue ){
+          this.img.nativeElement.attributes[1].nodeValue = ''
           const element = document.getElementById('canvasContainer');
           element.parentNode.removeChild(element);
-        }  
-        this.img.nativeElement.attributes[1].nodeValue = this.gifUrl;
-        this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: document.getElementById('bigContainer').clientWidth, max_height: document.getElementById('bigContainer').clientHeight, show_progress_bar: false, auto_play: false});
-        this.rub.load(this.play);
-        this.gifCanvas = document.getElementById('jsgif_canvas')
-        this.currentUrl = this.gifUrl
-      } else if ( this.gifUrl ) {
-        this.play()
+        } 
+
+        if ( this.gifUrl.substring(this.gifUrl.length - 4, this.gifUrl.length) === '.gif') {
+          this.updateInstructions('goodUrl') 
+          this.img.nativeElement.attributes[1].nodeValue = this.gifUrl;
+          this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: document.getElementById('bigContainer').clientWidth, max_height: document.getElementById('bigContainer').clientHeight, show_progress_bar: false, auto_play: false});
+          this.rub.load(this.setLoaded(true));
+          this.gifCanvas = document.getElementById('jsgif_canvas')
+          this.currentUrl = this.gifUrl
+        } else {
+          this.updateInstructions('badUrl')
+        }
       }
     }
 
