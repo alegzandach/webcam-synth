@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'projects-page',
@@ -9,7 +10,11 @@ import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
   export class ProjectsComponent {
     public view = 'list'
 
-    public toggle = (change) => {
-      this.view = change;
+    constructor(
+      private router: Router
+    ) {}
+
+    public navigate = (page) => {
+      this.router.navigate([`/${page}`])
     }
   };

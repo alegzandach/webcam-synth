@@ -1,9 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit, EventEmitter, Output } from '@angular/core';
 import { Router } from '@angular/router';
 
-declare var require: any;
-var Tone = require('tone/build/Tone');
-
 @Component({
     selector: 'nav-component',
     templateUrl: './nav.component.html',
