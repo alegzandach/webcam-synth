@@ -1,10 +1,11 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 
 @Component({
-    selector: 'bio-page',
-    templateUrl: './bio.component.html',
+    selector: 'contact-page',
+    templateUrl: './contact.component.html',
     styleUrls: ['../../app.component.css']
   })
 
-  export class BioComponent {
+  export class ContactComponent {
+
   };

@@ -1,13 +1,11 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
-import { GifComponent } from '../synths/gif/gif.component'
+import { ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { NavComponent } from '../components/nav/nav.component'
 import { BioComponent } from '../pages/bio/bio.component'
 import { ResumeComponent } from '../pages/resume/resume.component'
-import { ProjectComponent } from '../pages/project/project.component'
-
-
-declare var require: any;
-var Tone = require('tone/build/Tone');
+import { ProjectsComponent } from '../pages/projects/projects.component'
+import { ContactComponent } from '../pages/contact/contact.component'
 
 @Component({
     selector: 'home-app',
@@ -16,5 +14,14 @@ var Tone = require('tone/build/Tone');
   })
 
   export class HomeComponent {
-    public toggle: 'gif'
+
+    constructor(private actRoute: ActivatedRoute) {
+      this.currentPage = this.actRoute.snapshot.params.page;
+    }
+
+    public currentPage: string;
+
+    public changePage = (e) => {
+      this.currentPage = e
+    }
   };

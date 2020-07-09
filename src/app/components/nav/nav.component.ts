@@ -1,14 +1,26 @@
-import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, EventEmitter, Output } from '@angular/core';
+import { Router } from '@angular/router';
 
 declare var require: any;
 var Tone = require('tone/build/Tone');
 
 @Component({
-    selector: 'home-app',
+    selector: 'nav-component',
     templateUrl: './nav.component.html',
     styleUrls: ['../../app.component.css']
   })
 
   export class NavComponent {
-    public toggle: 'gif'
+
+    @Output()
+    clicked: EventEmitter<string> = new EventEmitter<string>()
+
+    constructor(
+      private router: Router
+    ) { }
+
+    public changePage = (page) => {
+      this.router.navigate([`/page/${page}`])
+      this.clicked.emit(page);
+    }
   };
