@@ -1,20 +1,35 @@
-import { HomeComponent } from './home/home.component'
+import { BioComponent } from './pages/bio/bio.component'
+import { ResumeComponent } from './pages/resume/resume.component'
+import { ProjectsComponent } from './pages/projects/projects.component'
+import { ContactComponent } from './pages/contact/contact.component'
 import { GifComponent } from './synths/gif/gif.component'
 import { NgModule } from '@angular/core'
 import { Routes, RouterModule } from "@angular/router";
 
 const routes: Routes = [
     { 
-        path: 'page/:page',
-        component: HomeComponent
+        path: 'bio',
+        component: BioComponent
     },
     { 
-        path: 'gifsynth',
+        path: 'resume',
+        component: ResumeComponent
+    },
+    { 
+        path: 'projects',
+        component: ProjectsComponent
+    },
+    {  
+        path: 'projects/gifsynth',
         component: GifComponent
     },
     { 
+        path: 'contact',
+        component: ContactComponent
+    },
+    { 
         path: '**',
-        component: HomeComponent
+        component: BioComponent
     },
 ]
 

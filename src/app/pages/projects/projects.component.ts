@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { NavComponent } from '../../components/nav/nav.component'
 
 @Component({
     selector: 'projects-page',

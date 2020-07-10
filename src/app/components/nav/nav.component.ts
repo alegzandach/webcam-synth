@@ -17,7 +17,7 @@ import { Router } from '@angular/router';
     ) { }
 
     public changePage = (page) => {
-      this.router.navigate([`/page/${page}`])
+      this.router.navigate([`/${page}`])
       this.clicked.emit(page);
     }
   };

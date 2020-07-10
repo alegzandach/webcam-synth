@@ -1,4 +1,5 @@
 import { Component, ElementRef, ViewChild, OnInit } from '@angular/core';
+import { NavComponent } from '../../components/nav/nav.component'
 
 @Component({
     selector: 'bio-page',
