@@ -1,9 +1,19 @@
 <div id="biggestContainer" style="display: flex; flex-direction: column; height: 97vh; width: 98vw">
     <div id="bigContainer" style="flex-grow: 1; margin-right: 8px;">
-        <div [hidden]="!showInstructions" [innerHTML]="instructions" style="text-align: center; margin-top: 25%;"></div>
         <img [hidden]="true" #img rel:animated_src="">
     </div>
-    <div style="text-align: center;">
+    <div style="margin: auto">
+        <div *ngIf="!playing" (click)="play()" style="text-align:center; width: 5rem; border-style: solid; padding: 5px; cursor: pointer">
+            play
+        </div>
+        <div *ngIf="playing" (click)="pause()" style="text-align:center; width: 5rem; border-style: solid; padding: 5px; cursor: pointer">
+            pause
+        </div>
+        <div (click)="back()" style="text-align:center; width: 5rem; border-style: solid; padding: 5px; margin-top: 5px; cursor: pointer">
+            back
+        </div>
+    </div>
+    <!--<div style="text-align: center;">
         <div *ngIf="!playing && loaded" (click)="play()" style="cursor: pointer">PLAY</div>
         <div *ngIf="playing && loaded" (click)="pause()" style="cursor: pointer">PAUSE</div>
         <div *ngIf="!playing && !loaded" style="color: white; cursor: default">PLAY</div>
@@ -11,6 +21,6 @@
         <input placeholder="gif url" [(ngModel)]="gifUrl" (ngModelChange)="showLoad = true">
         <div *ngIf="showLoad" (click)="load()" style="cursor: pointer">LOAD</div>
         <div *ngIf="!showLoad" (click)="load()" style="color: white; cursor: default">LOAD</div>
-    </div>
+    </div>-->
 </div>
 

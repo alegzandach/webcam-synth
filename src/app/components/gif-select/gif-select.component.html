@@ -1,0 +1,13 @@
+<table *ngIf="gifList.length == 0" style="width: 99vw; height: 90vh; margin-top: 3rem">
+    <td style="width: 100%; vertical-align: middle; text-align: center">
+        <input placeholder="what do you want to hear" style="text-align: center;" [(ngModel)]="searchTerm" (keyup.enter)="search(searchTerm)">
+    </td>
+</table>
+<table *ngIf="gifList.length != 0" style="width: 99vw; height: 90vh;">
+    <tr *ngFor="let row of gifList">
+        <td *ngFor="let col of row" style="width: 20%; height: 20%; vertical-align: middle; text-align: center">
+            <span style="vertical-align: top; writing-mode: vertical-rl; text-orientation: sideways">click one</span>
+            <img (click)="emitGif(col)" style="object-fit: contain; width: 50%; height: 50%" [src]="col">
+        </td>
+    </tr>
+</table>

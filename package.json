@@ -22,6 +22,7 @@
     "@angular/router": "^9.1.0",
     "core-js": "^2.4.1",
     "gif-canvas": "^1.0.0",
+    "giphy-api": "^2.0.1",
     "jsgif": "^1.0.2",
     "rxjs": "^6.5.5",
     "rxjs-compat": "^6.0.0-rc.0",

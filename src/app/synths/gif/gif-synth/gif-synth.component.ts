@@ -1,18 +1,18 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
 import { Observable } from 'rxjs'
-import * as SuperGif from '../../utility/libgif.js'
-
+import * as SuperGif from '../../../utility/libgif.js'
 
 declare var require: any;
 var Tone = require('tone/build/Tone');
 
 @Component({
-    selector: 'gif-player',
-    templateUrl: './gif.component.html',
-    styleUrls: ['../../app.component.css']
+    selector: 'gif-synth',
+    templateUrl: './gif-synth.component.html',
+    styleUrls: ['../../../app.component.css']
   })
 
-  export class GifComponent implements AfterViewInit {
+  export class GifSynthComponent implements AfterViewInit {
+    @Input() gifUrl: string
 
     public showVid = true;
     public cam;
@@ -33,19 +33,24 @@ var Tone = require('tone/build/Tone');
     public rub;
     public synth;
     public gifCanvas;
-    public gifUrl = 'https://media.giphy.com/media/J56c6H3S7qumk/giphy.gif'
+    //public gifUrl = 'https://media.giphy.com/media/J56c6H3S7qumk/giphy.gif'
     public currentUrl = ''
     public playing: boolean = false;
     public showInstructions: boolean = true;
     public instructions: string = "feed me a gif url in the box below, or use the one i pre-fed for you"
     public loaded: boolean = false;
     public showLoad: boolean = true;
+    public showSearch: boolean = true;
 
     @ViewChild('img') img: ElementRef;
     @ViewChild('gifCanvas') ctx: ElementRef;
 
-    public ngAfterViewInit() {
+    @Output()
+    backEmit: EventEmitter<string> = new EventEmitter<string>()
+
+    public async ngAfterViewInit() {
       this.synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
+      this.loadGrid(this.gifUrl);
     }
 
     public updateInstructions = (str) => {
@@ -92,9 +97,23 @@ var Tone = require('tone/build/Tone');
       }
     }
 
+    public loadGrid = (url) => {
+      this.img.nativeElement.attributes[1].nodeValue = url;
+      this.rub = new SuperGif({gif: this.img.nativeElement, on_change: this.onChange, max_width: document.getElementById('bigContainer').clientWidth, max_height: document.getElementById('bigContainer').clientHeight, show_progress_bar: false, auto_play: false});
+      this.rub.load(this.setLoaded(true));
+      this.gifCanvas = document.getElementById('jsgif_canvas')
+    }
+
     public pause = () => {
       this.rub.pause();
       this.playing = false;
+    }
+
+    public back = () => {
+      this.rub.pause();
+      this.playing = false;
+      this.img.nativeElement.attributes[1].nodeValue = "";
+      this.backEmit.emit();
     }
 
     public onChange = (data) => {
