@@ -16,7 +16,10 @@ import * as giphy from 'giphy-api/dist/giphy-api.bundle'
     public searchTerm;
 
     ngOnInit() {
-      this.giphyObj = new giphy('WQxTjRSZm93EY151uZb6eG7EA02X4k8I')
+      this.giphyObj = new giphy({
+        apiKey: 'WQxTjRSZm93EY151uZb6eG7EA02X4k8I',
+        https: true
+      })
     }
 
     @Output()
