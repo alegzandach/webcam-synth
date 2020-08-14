@@ -1,7 +1,18 @@
 <nav-component></nav-component>
-<table style="margin-top: 3rem;">
-    <td style="width: 99vw; height: 90vh; vertical-align: middle; margin-top: 3rem; text-align: center;">
-        <span (click)="navigate('projects/gifsynth')" style="border-style: solid; padding: 5px; cursor: pointer;">gif synthesizer</span>
+<table style="position: absolute; top: 0px; width: 99vw; height: 100vh; z-index: -1;">
+    <td style="width: 50%; height: 10vh; vertical-align: middle; margin-top: 3rem; text-align: center;">
+        <div style="background-color: rgb(19, 13, 102); padding-top: 20px; padding-bottom: 20px; margin-right: 5vw; margin-left: 5vw">
+            <span (click)="navigate('projects/gifsynth')" style="border-style: solid; padding: 5px; cursor: pointer; background-color:rgb(255, 145, 0);">gif synthesizer</span>
+        </div>
+    </td>
+    <td style="width: 50%; vertical-align: middle; margin-top: 3rem; text-align: center;">
+        <iframe style="border: 0; width: 350px; height: 470px;" src="https://bandcamp.com/EmbeddedPlayer/album=2375449111/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/transparent=true/" seamless><a href="http://diller.bandcamp.com/album/diller-ii">Diller II by Diller</a></iframe>
     </td>
 </table>
-
+<div style="position: absolute; top:25vh; left:25vw; background-color: #b700ff; height:50vh; width:50vw; z-index: -2;"></div>
+<style>
+    span:hover {
+        background-color: blue !important;
+        color:white;
+    }
+</style>

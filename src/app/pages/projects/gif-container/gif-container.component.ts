@@ -8,9 +8,8 @@ import { Router } from '@angular/router';
   })
 
   export class GifContainer {
-    public gifUrl;
+    public gifUrl = [];
     public showSearch = true;
-
 
     constructor(
       private router: Router
@@ -18,7 +17,7 @@ import { Router } from '@angular/router';
 
     public load = (url) => {
       this.showSearch = false
-      this.gifUrl = url
+      this.gifUrl.push(url)
     }
 
     public back = () => {

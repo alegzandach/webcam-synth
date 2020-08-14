@@ -7,5 +7,4 @@ import { NavComponent } from '../../components/nav/nav.component'
     styleUrls: ['../../app.component.css']
   })
 
-  export class BioComponent {
-  };
+  export class BioComponent {};
