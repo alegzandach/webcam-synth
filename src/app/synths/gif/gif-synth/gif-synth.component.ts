@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, Input, Output, EventEmitter, OnDestroy} from '@angular/core';
 import { Observable } from 'rxjs'
 import * as SuperGif from '../../../utility/libgif.js'
 
@@ -53,7 +53,7 @@ var Tone = require('tone/build/Tone');
       this.loadGrid(this.gifUrl);
     }
 
-    public ngOnDestroy() {
+    ngOnDestroy() {
       this.rub.pause();
     }
 
