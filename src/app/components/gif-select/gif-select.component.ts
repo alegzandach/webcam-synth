@@ -5,7 +5,6 @@ import * as giphy from 'giphy-api/dist/giphy-api.bundle'
 @Component({
     selector: 'gif-select',
     templateUrl: './gif-select.component.html',
-    styleUrls: ['../../app.component.css']
   })
 
   export class GifSelectComponent implements OnInit{

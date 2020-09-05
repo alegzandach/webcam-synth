@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, ElementRef, ViewChild, AfterViewInit, Input, Output, EventEmitter, OnDestroy } from '@angular/core';
 import { Observable } from 'rxjs'
 import * as SuperGif from '../../../utility/libgif.js'
 
@@ -51,6 +51,10 @@ var Tone = require('tone/build/Tone');
     public async ngAfterViewInit() {
       this.synth = new Tone.PolySynth(4, Tone.Synth).toMaster();
       this.loadGrid(this.gifUrl);
+    }
+
+    public ngOnDestroy() {
+      this.rub.pause();
     }
 
     public updateInstructions = (str) => {

@@ -4,7 +4,6 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'gif-container',
     templateUrl: './gif-container.component.html',
-    styleUrls: ['../../../app.component.css']
   })
 
   export class GifContainer {
