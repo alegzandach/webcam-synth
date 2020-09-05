@@ -1,0 +1,35 @@
+.table {
+    margin-left: -25px;
+    margin-right:-25px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+
+.cell {
+    width: 100%;
+    vertical-align: middle;
+    text-align: center
+}
+
+.txt {
+    padding-top: 20px;
+    padding-bottom:20px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    vertical-align: middle;
+    text-align: center;
+    background-color: #7a0000;
+    color: white
+}
+
+.bg {
+    position: absolute;
+    top:325vh;
+    left:25vw;
+    background-color:rgb(0, 2, 145);
+    height:50vh;
+    width:50vw;
+    z-index: -2;
+}

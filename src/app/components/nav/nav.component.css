@@ -1,0 +1,17 @@
+#nav {
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: auto;
+    margin: auto;
+    transition-property: background-color;
+    transition-duration: .2s;
+    transition-timing-function: cubic-bezier();
+}
+
+#nav:hover { 
+    background-color: white;
+    transition-property: background-color;
+    transition-duration: .2s;
+    transition-timing-function: cubic-bezier();
+}

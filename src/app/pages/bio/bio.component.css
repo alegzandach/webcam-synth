@@ -1,0 +1,87 @@
+.table {
+    margin-top: -9px;
+    margin-left: -25px;
+    margin-right:-25px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bioCell {
+    width: 50%;
+    vertical-align: middle;
+    text-align: center
+}
+
+.picCell {
+    width: 50%;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0px;
+}
+
+.bio {
+    padding-top: 20px; 
+    padding-bottom:20px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    vertical-align: middle;
+    text-align: center;
+    background-color: #00a2ff;
+    transition-property: transform opacity;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier();
+}
+
+.pic {
+    object-fit: contain;
+    width: 50%;
+    transition-property: transform opacity;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier();
+}
+
+.bg {
+    position: absolute;
+    top:25vh;
+    left:25vw;
+    background-color:yellow;
+    height:50vh;
+    width:50vw;
+    z-index: -2;
+    transition-property: transform opacity;
+    transition-duration: .5s;
+    transition-timing-function: cubic-bezier();
+}
+
+.bioStart {
+    padding-top: 20px; 
+    padding-bottom:20px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    vertical-align: middle;
+    text-align: center;
+    background-color: #00a2ff;
+    transform:translate(-5vw);
+    opacity: 0;
+}
+
+.picStart {
+    object-fit: contain;
+    width: 45%;
+    transform:translate(5vw);
+    opacity: 0;
+}
+
+.bgStart {
+    position: absolute;
+    top:25vh;
+    left:25vw;
+    background-color:yellow;
+    height:50vh;
+    width:50vw;
+    z-index: -2;
+    opacity: 0;
+}

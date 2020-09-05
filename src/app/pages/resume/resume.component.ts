@@ -4,7 +4,7 @@ import { NavComponent } from '../../components/nav/nav.component'
 @Component({
     selector: 'resume-page',
     templateUrl: './resume.component.html',
-    styleUrls: ['../../app.component.css']
+    styleUrls: ['./resume.component.css']
   })
 
   export class ResumeComponent {

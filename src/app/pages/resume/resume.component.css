@@ -1,0 +1,50 @@
+.table {
+    margin-left: -25px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+
+.td {
+    width: 50%;
+    vertical-align: middle;
+    padding: 20px
+}
+
+.eduList {
+    list-style-type: none;
+    background-color: #93ff85;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+    margin-right: 7vw;
+}
+
+.expList {
+    list-style-type: none;
+    background-color:  #93ff85;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-right: 20px;
+}
+
+.txt {
+    padding-top: 20px;
+    padding-bottom:20px;
+    margin-left: 5vw;
+    margin-right: 5vw;
+    vertical-align: middle;
+    text-align: center;
+    background-color: #7a0000;
+    color: white
+}
+
+.bg {
+    position: absolute;
+    top:125vh; left:25vw;
+    background-color:rgb(6, 114, 21);
+    height:50vh;
+    width:50vw;
+    z-index: -2;
+}

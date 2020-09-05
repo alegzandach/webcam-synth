@@ -1,0 +1,45 @@
+.table {
+    margin-left: -25px;
+    margin-right:-25px;
+    top: 0px;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+
+.td {
+    width: 50%;
+    height: 10vh;
+    text-align: center;
+    vertical-align: middle; 
+}
+
+.cell {
+    background-color: #e676e0;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    margin-right: 5vw;
+    margin-left: 5vw
+}
+
+.button {
+    border-style: solid;
+    padding: 5px;
+    cursor: pointer;
+    background-color:white
+}
+
+.button:hover {
+    background-color: black !important;
+    color:white;
+}
+
+.bg {
+    position: absolute;
+    top:225vh;
+    left:25vw;
+    background-color:rgb(211, 102, 0);
+    height:50vh;
+    width:50vw;
+    z-index: -2;
+}

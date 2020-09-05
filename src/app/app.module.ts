@@ -11,7 +11,8 @@ import { GifSelectComponent } from './components/gif-select/gif-select.component
 import { BioComponent } from './pages/bio/bio.component'
 import { ResumeComponent } from './pages/resume/resume.component'
 import { ProjectsComponent } from './pages/projects/projects.component'
-import { ContactComponent } from './pages/contact/contact.component'
+import { ContactComponent } from './pages/contact/contact.component';
+import { HomeComponent } from './home/home.component'
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { ContactComponent } from './pages/contact/contact.component'
     ProjectsComponent,
     ContactComponent,
     GifSelectComponent,
-    GifContainer
+    GifContainer,
+    HomeComponent
   ],
   imports: [
     BrowserModule,

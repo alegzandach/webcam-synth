@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 @Component({
     selector: 'nav-component',
     templateUrl: './nav.component.html',
-    styleUrls: ['../../app.component.css']
+    styleUrls: ['./nav.component.css']
   })
 
   export class NavComponent {

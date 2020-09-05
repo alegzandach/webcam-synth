@@ -5,7 +5,7 @@ import { NavComponent } from '../../components/nav/nav.component'
 @Component({
     selector: 'projects-page',
     templateUrl: './projects.component.html',
-    styleUrls: ['../../app.component.css']
+    styleUrls: ['./projects.component.css']
   })
 
   export class ProjectsComponent {

@@ -1,6 +1,6 @@
 <table *ngIf="gifList.length == 0" style="width: 99vw; height:97vh; overflow: hidden">
     <td style="width: 100%; vertical-align: middle; text-align: center; overflow: hidden">
-        <input placeholder="what do you want to hear" style="text-align: center; overflow: hidden" [(ngModel)]="searchTerm" (keyup.enter)="search(searchTerm)">
+        <input placeholder="what do you want to hear" style="border-style: solid; padding: 5px; text-align: center; overflow: hidden" [(ngModel)]="searchTerm" (keyup.enter)="search(searchTerm)">
     </td>
 </table>  
 <table *ngIf="gifList.length > 0" style="width: 98vw; height: 97vh">
@@ -12,4 +12,4 @@
             </div>
         </td>
     </tr>
-</table>
+</table> 
